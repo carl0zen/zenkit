@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background-color: rgba(145, 143, 126, 0.3);
+  }
+}
+
+@layer components {
+  .code-block {
+    @apply bg-zen-900 border border-zen-800 rounded-lg p-4 font-mono text-sm overflow-x-auto;
+  }
+
+  .section-divider {
+    @apply border-t border-zen-800/50 my-16 md:my-24;
+  }
+}
