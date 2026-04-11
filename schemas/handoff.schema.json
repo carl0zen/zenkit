@@ -1,0 +1,78 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://zenkit.dev/schemas/handoff.schema.json",
+  "title": "ZenKit Handoff Contract",
+  "description": "Structured handoff between agents or workflow stages in ZenKit.",
+  "type": "object",
+  "required": ["context", "assumptions", "decision", "deliverable", "next_agent"],
+  "properties": {
+    "context": {
+      "type": "string",
+      "description": "What is the current situation? What has happened so far?"
+    },
+    "assumptions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Explicit assumptions made during this stage."
+    },
+    "constraints": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Hard constraints that bound this work."
+    },
+    "decision": {
+      "type": "string",
+      "description": "What was decided and why."
+    },
+    "deliverable": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["code", "document", "schema", "plan", "review", "test", "artifact"]
+        },
+        "description": { "type": "string" },
+        "files_changed": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "validation_status": {
+          "type": "string",
+          "enum": ["passed", "failed", "partial", "untested"]
+        }
+      },
+      "required": ["type", "description"]
+    },
+    "risks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "description": { "type": "string" },
+          "severity": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+          "mitigation": { "type": "string" }
+        },
+        "required": ["description", "severity"]
+      }
+    },
+    "open_questions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Unresolved questions that the next agent should address."
+    },
+    "next_agent": {
+      "type": "string",
+      "description": "The agent or role that should receive this handoff."
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "timestamp": { "type": "string", "format": "date-time" },
+        "source_agent": { "type": "string" },
+        "command": { "type": "string" },
+        "iteration": { "type": "integer", "minimum": 0 }
+      }
+    }
+  },
+  "additionalProperties": false
+}

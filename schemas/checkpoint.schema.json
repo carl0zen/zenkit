@@ -1,0 +1,64 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://zenkit.dev/schemas/checkpoint.schema.json",
+  "title": "ZenKit Checkpoint",
+  "description": "A snapshot of workflow state at a specific point in execution.",
+  "type": "object",
+  "required": ["checkpoint_id", "task_id", "status", "timestamp"],
+  "properties": {
+    "checkpoint_id": {
+      "type": "string",
+      "pattern": "^chk-[a-z0-9-]+$"
+    },
+    "task_id": {
+      "type": "string"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["snapshot", "gate", "rollback_point"]
+    },
+    "stage": {
+      "type": "string",
+      "enum": ["plan", "build", "audit", "ship"]
+    },
+    "state": {
+      "type": "object",
+      "properties": {
+        "files_changed": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "tests_passing": { "type": "boolean" },
+        "lint_passing": { "type": "boolean" },
+        "git_ref": { "type": "string" },
+        "notes": { "type": "string" }
+      }
+    },
+    "gate_conditions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "condition": { "type": "string" },
+          "met": { "type": "boolean" }
+        },
+        "required": ["condition", "met"]
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "agent": { "type": "string" },
+        "command": { "type": "string" },
+        "iteration": { "type": "integer" },
+        "tokens_used": { "type": "integer" },
+        "cost_estimate_usd": { "type": "number" }
+      }
+    }
+  },
+  "additionalProperties": false
+}

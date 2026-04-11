@@ -1,0 +1,99 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://zenkit.dev/schemas/benchmark.schema.json",
+  "title": "ZenKit Benchmark Result",
+  "description": "Structured output from a ZenKit benchmark run.",
+  "type": "object",
+  "required": ["benchmark_id", "task_name", "start_time", "end_time", "status", "validation"],
+  "properties": {
+    "benchmark_id": {
+      "type": "string"
+    },
+    "task_name": {
+      "type": "string"
+    },
+    "feature_spec": {
+      "type": "string",
+      "description": "Path or reference to the feature spec used."
+    },
+    "start_time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "end_time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "duration_ms": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pass", "fail", "partial", "error"]
+    },
+    "files_changed": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "stages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "status"],
+        "properties": {
+          "name": { "type": "string" },
+          "status": { "type": "string", "enum": ["pass", "fail", "skipped"] },
+          "duration_ms": { "type": "integer" },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    "telemetry": {
+      "type": "object",
+      "properties": {
+        "estimated_tokens": { "type": "integer" },
+        "estimated_cost_usd": { "type": "number" },
+        "actual_tokens": { "type": "integer" },
+        "actual_cost_usd": { "type": "number" },
+        "telemetry_source": {
+          "type": "string",
+          "enum": ["actual", "estimated"],
+          "description": "Whether telemetry data is from real instrumentation or estimation."
+        }
+      },
+      "required": ["telemetry_source"]
+    },
+    "validation": {
+      "type": "object",
+      "properties": {
+        "tests_run": { "type": "integer" },
+        "tests_passed": { "type": "integer" },
+        "tests_failed": { "type": "integer" },
+        "schema_valid": { "type": "boolean" },
+        "lint_clean": { "type": "boolean" }
+      },
+      "required": ["tests_run", "tests_passed", "tests_failed"]
+    },
+    "retries": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "uncertainty_notes": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Explicit notes about what remains inferred or uncertain."
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": { "type": "string" },
+          "type": { "type": "string" }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}
