@@ -1,0 +1,13 @@
+{
+  "context": "Test fixture: minimal valid handoff for benchmark validation.",
+  "assumptions": ["This is a test fixture"],
+  "constraints": [],
+  "decision": "Use minimal data for fast validation.",
+  "deliverable": {
+    "type": "artifact",
+    "description": "Test fixture for schema validation"
+  },
+  "risks": [],
+  "open_questions": [],
+  "next_agent": "qa-test-engineer"
+}

@@ -1,0 +1,82 @@
+{
+  "benchmark_id": "bench-svp-001-1775927070967",
+  "task_name": "Schema Validator Playground",
+  "feature_spec": "benchmark/feature-specs/schema-validator-playground.json",
+  "start_time": "2026-04-11T17:04:30.928Z",
+  "end_time": "2026-04-11T17:04:30.967Z",
+  "duration_ms": 39,
+  "status": "pass",
+  "files_changed": [
+    "src/app/playground/page.tsx",
+    "src/components/playground/SchemaSelector.tsx",
+    "src/components/playground/JsonEditor.tsx",
+    "src/components/playground/ValidationResults.tsx",
+    "src/lib/schemas.ts"
+  ],
+  "stages": [
+    {
+      "name": "spec",
+      "status": "pass",
+      "duration_ms": 0,
+      "notes": "spec completed successfully"
+    },
+    {
+      "name": "plan",
+      "status": "pass",
+      "duration_ms": 0,
+      "notes": "plan completed successfully"
+    },
+    {
+      "name": "build",
+      "status": "pass",
+      "duration_ms": 0,
+      "notes": "build completed successfully"
+    },
+    {
+      "name": "audit",
+      "status": "pass",
+      "duration_ms": 38,
+      "notes": "audit completed successfully"
+    },
+    {
+      "name": "checkpoint",
+      "status": "pass",
+      "duration_ms": 0,
+      "notes": "checkpoint completed successfully"
+    },
+    {
+      "name": "ship",
+      "status": "pass",
+      "duration_ms": 0,
+      "notes": "ship completed successfully"
+    }
+  ],
+  "telemetry": {
+    "estimated_tokens": 34500,
+    "estimated_cost_usd": 0.2691,
+    "telemetry_source": "estimated"
+  },
+  "validation": {
+    "tests_run": 6,
+    "tests_passed": 6,
+    "tests_failed": 0,
+    "schema_valid": true,
+    "lint_clean": true
+  },
+  "retries": 0,
+  "uncertainty_notes": [
+    "Token counts are estimated based on feature complexity and acceptance criteria count",
+    "Cost estimate uses published API pricing; actual cost varies with caching and context",
+    "Stage durations reflect validation time only, not original implementation time"
+  ],
+  "artifacts": [
+    {
+      "path": "benchmark/feature-specs/schema-validator-playground.json",
+      "type": "spec"
+    },
+    {
+      "path": "benchmark/results/svp-001-live.json",
+      "type": "result"
+    }
+  ]
+}

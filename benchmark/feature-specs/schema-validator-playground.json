@@ -1,0 +1,37 @@
+{
+  "feature_id": "svp-001",
+  "name": "Schema Validator Playground",
+  "description": "An interactive web-based tool for validating JSON data against ZenKit schemas. Users select a schema, enter or paste JSON, and receive immediate validation results with detailed error messages.",
+  "acceptance_criteria": [
+    "User can select from all available ZenKit schemas (handoff, task, audit, checkpoint, benchmark)",
+    "User can enter or paste JSON data into an editor area",
+    "Validation runs on demand when user clicks validate",
+    "Valid data shows a clear success indicator",
+    "Invalid data shows all validation errors with JSON paths and descriptions",
+    "Pre-loaded example data is available for each schema"
+  ],
+  "constraints": [
+    "Must work entirely client-side with no backend API calls",
+    "Must use the same schema validation library as the core ZenKit tooling (Ajv)",
+    "Must be accessible via keyboard navigation",
+    "Must be responsive for mobile and desktop"
+  ],
+  "scope_boundaries": {
+    "in_scope": [
+      "Schema selection UI",
+      "JSON text editor with syntax indication",
+      "Client-side validation with Ajv",
+      "Error display with path and message",
+      "Example data loading",
+      "Integration with landing page navigation"
+    ],
+    "out_of_scope": [
+      "Schema editing or creation",
+      "Saving validation history",
+      "Sharing validation results via URL",
+      "Custom schema upload"
+    ]
+  },
+  "assigned_commands": ["spec", "plan", "build", "audit", "checkpoint", "ship"],
+  "estimated_complexity": "medium"
+}
