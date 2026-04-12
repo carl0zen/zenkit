@@ -2,97 +2,116 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://zenkit.dev/schemas/benchmark.schema.json",
   "title": "ZenKit Benchmark Result",
-  "description": "Structured output from a ZenKit benchmark run.",
+  "description": "Structured output from a ZenKit benchmark run with acceptance criteria verification.",
   "type": "object",
-  "required": ["benchmark_id", "task_name", "start_time", "end_time", "status", "validation"],
+  "required": ["benchmark_id", "version", "mode", "task_name", "started_at", "completed_at", "status", "validation_summary", "acceptance_criteria_results"],
   "properties": {
-    "benchmark_id": {
-      "type": "string"
-    },
-    "task_name": {
-      "type": "string"
-    },
-    "feature_spec": {
+    "benchmark_id": { "type": "string" },
+    "version": { "type": "string" },
+    "mode": {
       "type": "string",
-      "description": "Path or reference to the feature spec used."
+      "enum": ["zenkit", "baseline"],
+      "description": "Whether this run used ZenKit workflow structure or an unstructured baseline."
     },
-    "start_time": {
-      "type": "string",
-      "format": "date-time"
-    },
-    "end_time": {
-      "type": "string",
-      "format": "date-time"
-    },
-    "duration_ms": {
-      "type": "integer",
-      "minimum": 0
-    },
+    "task_name": { "type": "string" },
+    "feature_spec": { "type": "string" },
+    "started_at": { "type": "string", "format": "date-time" },
+    "completed_at": { "type": "string", "format": "date-time" },
+    "duration_ms": { "type": "integer", "minimum": 0 },
     "status": {
       "type": "string",
-      "enum": ["pass", "fail", "partial", "error"]
+      "enum": ["pass", "fail", "partial"]
     },
-    "files_changed": {
+    "expected_files": {
       "type": "array",
       "items": { "type": "string" }
+    },
+    "files_found": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "files_missing": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "acceptance_criteria_results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "description", "status", "evidence", "verification_type"],
+        "properties": {
+          "id": { "type": "string" },
+          "description": { "type": "string" },
+          "status": { "type": "string", "enum": ["pass", "fail"] },
+          "evidence": { "type": "string", "description": "What was actually checked and found." },
+          "verification_type": { "type": "string" }
+        }
+      }
     },
     "stages": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["name", "status"],
+        "required": ["name", "status", "checks_run", "checks_passed"],
         "properties": {
           "name": { "type": "string" },
           "status": { "type": "string", "enum": ["pass", "fail", "skipped"] },
           "duration_ms": { "type": "integer" },
-          "notes": { "type": "string" }
+          "checks_run": { "type": "integer", "minimum": 0 },
+          "checks_passed": { "type": "integer", "minimum": 0 },
+          "details": { "type": "array", "items": { "type": "string" } }
         }
+      }
+    },
+    "validation_summary": {
+      "type": "object",
+      "required": ["total_criteria", "criteria_passed", "criteria_failed"],
+      "properties": {
+        "total_criteria": { "type": "integer" },
+        "criteria_passed": { "type": "integer" },
+        "criteria_failed": { "type": "integer" },
+        "schemas_valid": { "type": "boolean" },
+        "examples_valid": { "type": "boolean" }
       }
     },
     "telemetry": {
       "type": "object",
+      "required": ["estimated"],
       "properties": {
-        "estimated_tokens": { "type": "integer" },
-        "estimated_cost_usd": { "type": "number" },
-        "actual_tokens": { "type": "integer" },
-        "actual_cost_usd": { "type": "number" },
-        "telemetry_source": {
-          "type": "string",
-          "enum": ["actual", "estimated"],
-          "description": "Whether telemetry data is from real instrumentation or estimation."
-        }
-      },
-      "required": ["telemetry_source"]
-    },
-    "validation": {
-      "type": "object",
-      "properties": {
-        "tests_run": { "type": "integer" },
-        "tests_passed": { "type": "integer" },
-        "tests_failed": { "type": "integer" },
-        "schema_valid": { "type": "boolean" },
-        "lint_clean": { "type": "boolean" }
-      },
-      "required": ["tests_run", "tests_passed", "tests_failed"]
-    },
-    "retries": {
-      "type": "integer",
-      "minimum": 0
-    },
-    "uncertainty_notes": {
-      "type": "array",
-      "items": { "type": "string" },
-      "description": "Explicit notes about what remains inferred or uncertain."
-    },
-    "artifacts": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "path": { "type": "string" },
-          "type": { "type": "string" }
+        "estimated": {
+          "type": "object",
+          "required": ["tokens", "cost_usd", "basis"],
+          "properties": {
+            "tokens": { "type": "integer" },
+            "cost_usd": { "type": "number" },
+            "basis": { "type": "string", "description": "How the estimate was calculated." }
+          }
+        },
+        "actual": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "required": ["tokens", "cost_usd"],
+              "properties": {
+                "tokens": { "type": "integer" },
+                "cost_usd": { "type": "number" }
+              }
+            }
+          ],
+          "description": "Null when no real telemetry is available. Never fabricated."
         }
       }
+    },
+    "uncertainty": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "What this benchmark does NOT prove."
+    },
+    "limitations": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Inherited from the feature spec — scope boundaries of the verification."
     }
   },
   "additionalProperties": false

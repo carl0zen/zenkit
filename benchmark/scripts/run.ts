@@ -1,8 +1,9 @@
 /**
  * ZenKit Benchmark Runner
  *
- * Processes a feature spec through a simulated ZenKit workflow,
- * validates each stage, and produces a structured benchmark result.
+ * Verifies acceptance criteria from a feature spec against the actual
+ * implementation. Produces structured results distinguishing validated
+ * checks from estimated/illustrative data.
  *
  * Usage: npx tsx benchmark/scripts/run.ts [feature-spec-path]
  */
@@ -11,66 +12,110 @@ import path from 'path'
 import Ajv from 'ajv'
 import addFormats from 'ajv-formats'
 
-const ajv = new Ajv({ allErrors: true, strict: false })
-addFormats(ajv)
+// --- Types ---
+
+interface Verification {
+  type: 'file_exists' | 'file_contains' | 'schema_count' | 'examples_valid' | 'schemas_consistent'
+  path?: string
+  pattern?: string
+  expected?: number
+}
+
+interface AcceptanceCriterion {
+  id: string
+  description: string
+  verification: Verification
+}
 
 interface FeatureSpec {
   feature_id: string
   name: string
   description: string
-  acceptance_criteria: string[]
+  mode: 'zenkit' | 'baseline'
+  acceptance_criteria: AcceptanceCriterion[]
   constraints: string[]
-  scope_boundaries: {
-    in_scope: string[]
-    out_of_scope: string[]
-  }
+  expected_files: string[]
   assigned_commands: string[]
   estimated_complexity: string
+  limitations: string[]
+}
+
+interface CriterionResult {
+  id: string
+  description: string
+  status: 'pass' | 'fail'
+  evidence: string
+  verification_type: string
 }
 
 interface StageResult {
   name: string
   status: 'pass' | 'fail' | 'skipped'
   duration_ms: number
-  notes: string
+  checks_run: number
+  checks_passed: number
+  details: string[]
 }
 
 interface BenchmarkResult {
   benchmark_id: string
+  version: string
+  mode: 'zenkit' | 'baseline'
   task_name: string
   feature_spec: string
-  start_time: string
-  end_time: string
+  started_at: string
+  completed_at: string
   duration_ms: number
-  status: 'pass' | 'fail' | 'partial' | 'error'
-  files_changed: string[]
+  status: 'pass' | 'fail' | 'partial'
+  expected_files: string[]
+  files_found: string[]
+  files_missing: string[]
+  acceptance_criteria_results: CriterionResult[]
   stages: StageResult[]
+  validation_summary: {
+    total_criteria: number
+    criteria_passed: number
+    criteria_failed: number
+    schemas_valid: boolean
+    examples_valid: boolean
+  }
   telemetry: {
-    estimated_tokens: number
-    estimated_cost_usd: number
-    telemetry_source: 'estimated' | 'actual'
+    estimated: {
+      tokens: number
+      cost_usd: number
+      basis: string
+    }
+    actual: null | {
+      tokens: number
+      cost_usd: number
+    }
   }
-  validation: {
-    tests_run: number
-    tests_passed: number
-    tests_failed: number
-    schema_valid: boolean
-    lint_clean: boolean
-  }
-  retries: number
-  uncertainty_notes: string[]
-  artifacts: Array<{ path: string; type: string }>
+  uncertainty: string[]
+  limitations: string[]
 }
 
-function loadFeatureSpec(specPath: string): FeatureSpec {
-  const raw = fs.readFileSync(specPath, 'utf-8')
-  return JSON.parse(raw)
+// --- Helpers ---
+
+const ROOT = path.resolve(__dirname, '../..')
+
+function resolve(p: string): string {
+  return path.resolve(ROOT, p)
 }
 
-function validateSchemas(): boolean {
-  const schemasDir = path.resolve(__dirname, '../../schemas')
-  const files = fs.readdirSync(schemasDir).filter((f) => f.endsWith('.schema.json'))
-  let valid = true
+function fileExists(p: string): boolean {
+  return fs.existsSync(resolve(p))
+}
+
+function fileContains(p: string, pattern: string): boolean {
+  if (!fileExists(p)) return false
+  const content = fs.readFileSync(resolve(p), 'utf-8')
+  return content.includes(pattern)
+}
+
+function compileAllSchemas(): { valid: boolean; count: number; errors: string[] } {
+  const schemasDir = resolve('schemas')
+  const files = fs.readdirSync(schemasDir).filter(f => f.endsWith('.schema.json'))
+  const errors: string[] = []
 
   for (const file of files) {
     const localAjv = new Ajv({ allErrors: true, strict: false })
@@ -78,55 +123,262 @@ function validateSchemas(): boolean {
     const schema = JSON.parse(fs.readFileSync(path.join(schemasDir, file), 'utf-8'))
     try {
       localAjv.compile(schema)
-    } catch {
-      valid = false
-      console.error(`Schema validation failed: ${file}`)
+    } catch (err) {
+      errors.push(`${file}: ${err}`)
     }
   }
-  return valid
+
+  return { valid: errors.length === 0, count: files.length, errors }
 }
 
-function runStage(name: string, fn: () => boolean): StageResult {
-  const start = Date.now()
-  let status: 'pass' | 'fail' = 'pass'
-  let notes = ''
+function checkSchemasConsistent(): { consistent: boolean; details: string } {
+  const schemasDir = resolve('schemas')
+  const files = fs.readdirSync(schemasDir).filter(f => f.endsWith('.schema.json'))
+  const drafts = new Set<string>()
 
-  try {
-    const passed = fn()
-    status = passed ? 'pass' : 'fail'
-    notes = passed ? `${name} completed successfully` : `${name} failed validation`
-  } catch (err) {
-    status = 'fail'
-    notes = `Error in ${name}: ${err}`
+  for (const file of files) {
+    const schema = JSON.parse(fs.readFileSync(path.join(schemasDir, file), 'utf-8'))
+    if (schema.$schema) drafts.add(schema.$schema)
+  }
+
+  const consistent = drafts.size === 1
+  return {
+    consistent,
+    details: consistent
+      ? `All ${files.length} schemas use ${[...drafts][0]}`
+      : `Inconsistent drafts: ${[...drafts].join(', ')}`,
+  }
+}
+
+function checkExamplesValid(): { valid: boolean; details: string[] } {
+  // Dynamic import won't work in tsx script, so we re-implement validation inline
+  const schemasDir = resolve('schemas')
+  const schemaFiles: Record<string, string> = {
+    handoff: 'handoff.schema.json',
+    task: 'task.schema.json',
+    audit: 'audit.schema.json',
+    checkpoint: 'checkpoint.schema.json',
+    benchmark: 'benchmark.schema.json',
+  }
+
+  const details: string[] = []
+  let allValid = true
+
+  // Load example data by reading the TS file and extracting JSON-like structure
+  // Since we can't import TS directly, we validate example fixtures instead
+  const fixtureDir = resolve('benchmark/fixtures')
+  if (fs.existsSync(fixtureDir)) {
+    const fixtures = fs.readdirSync(fixtureDir).filter(f => f.endsWith('.json'))
+    for (const fixture of fixtures) {
+      const data = JSON.parse(fs.readFileSync(path.join(fixtureDir, fixture), 'utf-8'))
+      // Try to validate against handoff schema (our main fixture)
+      const localAjv = new Ajv({ allErrors: true, strict: false })
+      addFormats(localAjv)
+      const schema = JSON.parse(fs.readFileSync(path.join(schemasDir, 'handoff.schema.json'), 'utf-8'))
+      const validate = localAjv.compile(schema)
+      const valid = validate(data)
+      if (valid) {
+        details.push(`${fixture}: valid against handoff.schema.json`)
+      } else {
+        details.push(`${fixture}: INVALID — ${validate.errors?.map(e => e.message).join(', ')}`)
+        allValid = false
+      }
+    }
+  }
+
+  // Also check that the schema library file registers all schemas
+  const schemasTs = resolve('src/lib/schemas.ts')
+  if (fs.existsSync(schemasTs)) {
+    const content = fs.readFileSync(schemasTs, 'utf-8')
+    for (const name of Object.keys(schemaFiles)) {
+      if (content.includes(`${name}:`)) {
+        details.push(`schemas.ts registers '${name}'`)
+      } else {
+        details.push(`schemas.ts MISSING registration for '${name}'`)
+        allValid = false
+      }
+    }
+  }
+
+  return { valid: allValid, details }
+}
+
+// --- Criterion Verification ---
+
+function verifyCriterion(criterion: AcceptanceCriterion): CriterionResult {
+  const { verification } = criterion
+
+  switch (verification.type) {
+    case 'file_exists': {
+      const exists = fileExists(verification.path!)
+      return {
+        id: criterion.id,
+        description: criterion.description,
+        status: exists ? 'pass' : 'fail',
+        evidence: exists ? `${verification.path} exists` : `${verification.path} not found`,
+        verification_type: 'file_exists',
+      }
+    }
+
+    case 'file_contains': {
+      const found = fileContains(verification.path!, verification.pattern!)
+      return {
+        id: criterion.id,
+        description: criterion.description,
+        status: found ? 'pass' : 'fail',
+        evidence: found
+          ? `${verification.path} contains '${verification.pattern}'`
+          : `${verification.path} does not contain '${verification.pattern}'`,
+        verification_type: 'file_contains',
+      }
+    }
+
+    case 'schema_count': {
+      const result = compileAllSchemas()
+      const pass = result.count === verification.expected!
+      return {
+        id: criterion.id,
+        description: criterion.description,
+        status: pass ? 'pass' : 'fail',
+        evidence: `${result.count} schemas found (expected ${verification.expected}), ${result.errors.length} compilation errors`,
+        verification_type: 'schema_count',
+      }
+    }
+
+    case 'examples_valid': {
+      const result = checkExamplesValid()
+      return {
+        id: criterion.id,
+        description: criterion.description,
+        status: result.valid ? 'pass' : 'fail',
+        evidence: result.details.join('; '),
+        verification_type: 'examples_valid',
+      }
+    }
+
+    case 'schemas_consistent': {
+      const result = checkSchemasConsistent()
+      return {
+        id: criterion.id,
+        description: criterion.description,
+        status: result.consistent ? 'pass' : 'fail',
+        evidence: result.details,
+        verification_type: 'schemas_consistent',
+      }
+    }
+
+    default:
+      return {
+        id: criterion.id,
+        description: criterion.description,
+        status: 'fail',
+        evidence: `Unknown verification type: ${verification.type}`,
+        verification_type: 'unknown',
+      }
+  }
+}
+
+// --- Stage Runners ---
+
+function runSpecStage(spec: FeatureSpec): StageResult {
+  const start = Date.now()
+  const checks: string[] = []
+  let passed = 0
+  const total = 3
+
+  if (spec.name.length > 0) { passed++; checks.push('name present') }
+  else checks.push('FAIL: name empty')
+
+  if (spec.acceptance_criteria.length > 0) { passed++; checks.push(`${spec.acceptance_criteria.length} acceptance criteria defined`) }
+  else checks.push('FAIL: no acceptance criteria')
+
+  if (spec.limitations.length > 0) { passed++; checks.push(`${spec.limitations.length} limitations declared`) }
+  else checks.push('FAIL: no limitations declared — specs should be honest about scope')
+
+  return {
+    name: 'spec',
+    status: passed === total ? 'pass' : 'fail',
+    duration_ms: Date.now() - start,
+    checks_run: total,
+    checks_passed: passed,
+    details: checks,
+  }
+}
+
+function runBuildStage(spec: FeatureSpec): StageResult {
+  const start = Date.now()
+  const checks: string[] = []
+  let passed = 0
+
+  for (const file of spec.expected_files) {
+    if (fileExists(file)) {
+      passed++
+      checks.push(`${file} exists`)
+    } else {
+      checks.push(`FAIL: ${file} not found`)
+    }
   }
 
   return {
-    name,
-    status,
+    name: 'build',
+    status: passed === spec.expected_files.length ? 'pass' : 'fail',
     duration_ms: Date.now() - start,
-    notes,
+    checks_run: spec.expected_files.length,
+    checks_passed: passed,
+    details: checks,
   }
 }
 
-function estimateTokens(spec: FeatureSpec): number {
-  const baseTokens = 5000
-  const perCriteria = 3000
-  const complexityMultiplier =
-    spec.estimated_complexity === 'high' ? 2.0 :
-    spec.estimated_complexity === 'medium' ? 1.5 : 1.0
+function runAuditStage(criteriaResults: CriterionResult[]): StageResult {
+  const start = Date.now()
+  const passed = criteriaResults.filter(c => c.status === 'pass').length
+  const total = criteriaResults.length
 
-  return Math.round(
-    (baseTokens + spec.acceptance_criteria.length * perCriteria) * complexityMultiplier
-  )
+  return {
+    name: 'audit',
+    status: passed === total ? 'pass' : passed > 0 ? 'fail' : 'fail',
+    duration_ms: Date.now() - start,
+    checks_run: total,
+    checks_passed: passed,
+    details: criteriaResults.map(c => `[${c.status.toUpperCase()}] ${c.id}: ${c.evidence}`),
+  }
+}
+
+function runSchemaStage(): StageResult {
+  const start = Date.now()
+  const result = compileAllSchemas()
+  const consistency = checkSchemasConsistent()
+
+  return {
+    name: 'schemas',
+    status: result.valid && consistency.consistent ? 'pass' : 'fail',
+    duration_ms: Date.now() - start,
+    checks_run: result.count + 1,
+    checks_passed: (result.count - result.errors.length) + (consistency.consistent ? 1 : 0),
+    details: [
+      `${result.count} schemas compiled, ${result.errors.length} errors`,
+      consistency.details,
+      ...result.errors,
+    ],
+  }
+}
+
+// --- Telemetry ---
+
+function estimateTokens(spec: FeatureSpec): number {
+  const base = 5000
+  const perCriterion = 2500
+  const multiplier = spec.estimated_complexity === 'high' ? 2.0 :
+    spec.estimated_complexity === 'medium' ? 1.5 : 1.0
+  return Math.round((base + spec.acceptance_criteria.length * perCriterion) * multiplier)
 }
 
 function estimateCost(tokens: number): number {
-  // Estimated cost based on typical API pricing
-  // Input: ~$3/M tokens, Output: ~$15/M tokens, assuming 60/40 split
-  const inputTokens = tokens * 0.6
-  const outputTokens = tokens * 0.4
-  return (inputTokens * 3 + outputTokens * 15) / 1_000_000
+  // $3/M input, $15/M output, assuming 60/40 split
+  return (tokens * 0.6 * 3 + tokens * 0.4 * 15) / 1_000_000
 }
+
+// --- Main ---
 
 async function main() {
   const specPath = process.argv[2] || 'benchmark/feature-specs/schema-validator-playground.json'
@@ -137,127 +389,121 @@ async function main() {
     process.exit(1)
   }
 
-  console.log('ZenKit Benchmark Runner')
-  console.log('=======================\n')
+  console.log('ZenKit Benchmark Runner v0.2')
+  console.log('============================\n')
 
   const startTime = new Date()
-  const spec = loadFeatureSpec(resolvedPath)
+  const spec: FeatureSpec = JSON.parse(fs.readFileSync(resolvedPath, 'utf-8'))
 
   console.log(`Feature: ${spec.name}`)
-  console.log(`Complexity: ${spec.estimated_complexity}`)
-  console.log(`Acceptance criteria: ${spec.acceptance_criteria.length}`)
+  console.log(`Mode: ${spec.mode}`)
+  console.log(`Criteria: ${spec.acceptance_criteria.length}`)
+  console.log(`Expected files: ${spec.expected_files.length}`)
   console.log()
 
+  // Run stages
   const stages: StageResult[] = []
 
-  // Stage 1: Spec validation
-  stages.push(runStage('spec', () => {
-    return (
-      spec.name.length > 0 &&
-      spec.acceptance_criteria.length > 0 &&
-      spec.constraints.length > 0
-    )
-  }))
-  console.log(`  [${stages[stages.length - 1].status}] spec`)
+  // 1. Spec validation
+  const specStage = runSpecStage(spec)
+  stages.push(specStage)
+  console.log(`  [${specStage.status}] spec (${specStage.checks_passed}/${specStage.checks_run})`)
 
-  // Stage 2: Plan validation
-  stages.push(runStage('plan', () => {
-    return (
-      spec.assigned_commands.length > 0 &&
-      spec.scope_boundaries.in_scope.length > 0
-    )
-  }))
-  console.log(`  [${stages[stages.length - 1].status}] plan`)
+  // 2. Schema compilation
+  const schemaStage = runSchemaStage()
+  stages.push(schemaStage)
+  console.log(`  [${schemaStage.status}] schemas (${schemaStage.checks_passed}/${schemaStage.checks_run})`)
 
-  // Stage 3: Build validation (check that referenced files exist)
-  stages.push(runStage('build', () => {
-    // Check if the feature has been built by looking for key files
-    const keyPaths = [
-      'src/app/playground/page.tsx',
-      'src/components/playground/SchemaSelector.tsx',
-      'src/lib/schemas.ts',
-    ]
-    return keyPaths.every((p) => fs.existsSync(path.resolve(__dirname, '../../', p)))
-  }))
-  console.log(`  [${stages[stages.length - 1].status}] build`)
+  // 3. Build verification (expected files)
+  const buildStage = runBuildStage(spec)
+  stages.push(buildStage)
+  console.log(`  [${buildStage.status}] build (${buildStage.checks_passed}/${buildStage.checks_run})`)
 
-  // Stage 4: Audit (schema validation)
-  stages.push(runStage('audit', () => {
-    return validateSchemas()
-  }))
-  console.log(`  [${stages[stages.length - 1].status}] audit`)
-
-  // Stage 5: Checkpoint
-  stages.push(runStage('checkpoint', () => {
-    return stages.every((s) => s.status === 'pass')
-  }))
-  console.log(`  [${stages[stages.length - 1].status}] checkpoint`)
-
-  // Stage 6: Ship
-  stages.push(runStage('ship', () => {
-    return stages.every((s) => s.status === 'pass')
-  }))
-  console.log(`  [${stages[stages.length - 1].status}] ship`)
+  // 4. Acceptance criteria audit
+  const criteriaResults = spec.acceptance_criteria.map(verifyCriterion)
+  const auditStage = runAuditStage(criteriaResults)
+  stages.push(auditStage)
+  console.log(`  [${auditStage.status}] audit (${auditStage.checks_passed}/${auditStage.checks_run})`)
 
   const endTime = new Date()
-  const allPassed = stages.every((s) => s.status === 'pass')
+  const allPassed = stages.every(s => s.status === 'pass')
+  const anyPassed = stages.some(s => s.status === 'pass')
   const estimatedTokens = estimateTokens(spec)
+
+  // Determine actual files found/missing
+  const filesFound = spec.expected_files.filter(fileExists)
+  const filesMissing = spec.expected_files.filter(f => !fileExists(f))
 
   const result: BenchmarkResult = {
     benchmark_id: `bench-${spec.feature_id}-${Date.now()}`,
+    version: '0.2.0',
+    mode: spec.mode,
     task_name: spec.name,
     feature_spec: specPath,
-    start_time: startTime.toISOString(),
-    end_time: endTime.toISOString(),
+    started_at: startTime.toISOString(),
+    completed_at: endTime.toISOString(),
     duration_ms: endTime.getTime() - startTime.getTime(),
-    status: allPassed ? 'pass' : 'fail',
-    files_changed: [
-      'src/app/playground/page.tsx',
-      'src/components/playground/SchemaSelector.tsx',
-      'src/components/playground/JsonEditor.tsx',
-      'src/components/playground/ValidationResults.tsx',
-      'src/lib/schemas.ts',
-    ],
+    status: allPassed ? 'pass' : anyPassed ? 'partial' : 'fail',
+    expected_files: spec.expected_files,
+    files_found: filesFound,
+    files_missing: filesMissing,
+    acceptance_criteria_results: criteriaResults,
     stages,
+    validation_summary: {
+      total_criteria: criteriaResults.length,
+      criteria_passed: criteriaResults.filter(c => c.status === 'pass').length,
+      criteria_failed: criteriaResults.filter(c => c.status === 'fail').length,
+      schemas_valid: schemaStage.status === 'pass',
+      examples_valid: criteriaResults.find(c => c.id === 'ac-6')?.status === 'pass' || false,
+    },
     telemetry: {
-      estimated_tokens: estimatedTokens,
-      estimated_cost_usd: estimateCost(estimatedTokens),
-      telemetry_source: 'estimated',
+      estimated: {
+        tokens: estimatedTokens,
+        cost_usd: estimateCost(estimatedTokens),
+        basis: 'Heuristic: 5000 base + 2500 per criterion, scaled by complexity',
+      },
+      actual: null,
     },
-    validation: {
-      tests_run: stages.length,
-      tests_passed: stages.filter((s) => s.status === 'pass').length,
-      tests_failed: stages.filter((s) => s.status === 'fail').length,
-      schema_valid: validateSchemas(),
-      lint_clean: true,
-    },
-    retries: 0,
-    uncertainty_notes: [
-      'Token counts are estimated based on feature complexity and acceptance criteria count',
-      'Cost estimate uses published API pricing; actual cost varies with caching and context',
-      'Stage durations reflect validation time only, not original implementation time',
+    uncertainty: [
+      'Token and cost figures are estimates — no actual API telemetry is captured by this runner',
+      'Acceptance criteria verify code structure and schema validity, not runtime UI behavior',
+      'Stage durations reflect verification time, not original implementation time',
     ],
-    artifacts: [
-      { path: specPath, type: 'spec' },
-      { path: `benchmark/results/${spec.feature_id}-live.json`, type: 'result' },
-    ],
+    limitations: spec.limitations,
   }
 
   // Write result
-  const resultPath = path.resolve(__dirname, `../results/${spec.feature_id}-live.json`)
+  const resultPath = resolve(`benchmark/results/${spec.feature_id}-live.json`)
   fs.mkdirSync(path.dirname(resultPath), { recursive: true })
   fs.writeFileSync(resultPath, JSON.stringify(result, null, 2))
 
-  console.log(`\n${'='.repeat(40)}`)
-  console.log(`Status: ${result.status.toUpperCase()}`)
-  console.log(`Duration: ${result.duration_ms}ms`)
-  console.log(`Stages: ${result.validation.tests_passed}/${result.validation.tests_run} passed`)
-  console.log(`Est. tokens: ${estimatedTokens.toLocaleString()}`)
-  console.log(`Est. cost: $${result.telemetry.estimated_cost_usd.toFixed(2)}`)
-  console.log(`Result: ${resultPath}`)
+  // Summary
+  const totalChecks = stages.reduce((sum, s) => sum + s.checks_run, 0)
+  const totalPassed = stages.reduce((sum, s) => sum + s.checks_passed, 0)
+
+  console.log(`\n${'='.repeat(50)}`)
+  console.log(`Status:     ${result.status.toUpperCase()}`)
+  console.log(`Checks:     ${totalPassed}/${totalChecks} passed`)
+  console.log(`Criteria:   ${result.validation_summary.criteria_passed}/${result.validation_summary.total_criteria} passed`)
+  console.log(`Files:      ${filesFound.length}/${spec.expected_files.length} found`)
+  console.log(`Duration:   ${result.duration_ms}ms`)
+  console.log(`Est tokens: ~${estimatedTokens.toLocaleString()} (estimated)`)
+  console.log(`Est cost:   ~$${result.telemetry.estimated.cost_usd.toFixed(2)} (estimated)`)
+  console.log(`Result:     ${resultPath}`)
+
+  if (filesMissing.length > 0) {
+    console.log(`\nMissing files:`)
+    filesMissing.forEach(f => console.log(`  - ${f}`))
+  }
+
+  const failedCriteria = criteriaResults.filter(c => c.status === 'fail')
+  if (failedCriteria.length > 0) {
+    console.log(`\nFailed criteria:`)
+    failedCriteria.forEach(c => console.log(`  - ${c.id}: ${c.evidence}`))
+  }
 }
 
-main().catch((err) => {
+main().catch(err => {
   console.error('Benchmark failed:', err)
   process.exit(1)
 })
