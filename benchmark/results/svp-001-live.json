@@ -1,82 +1,167 @@
 {
-  "benchmark_id": "bench-svp-001-1775927070967",
+  "benchmark_id": "bench-svp-001-1776023986316",
+  "version": "0.2.0",
+  "mode": "zenkit",
   "task_name": "Schema Validator Playground",
   "feature_spec": "benchmark/feature-specs/schema-validator-playground.json",
-  "start_time": "2026-04-11T17:04:30.928Z",
-  "end_time": "2026-04-11T17:04:30.967Z",
-  "duration_ms": 39,
+  "started_at": "2026-04-12T19:59:46.248Z",
+  "completed_at": "2026-04-12T19:59:46.316Z",
+  "duration_ms": 68,
   "status": "pass",
-  "files_changed": [
+  "expected_files": [
     "src/app/playground/page.tsx",
     "src/components/playground/SchemaSelector.tsx",
     "src/components/playground/JsonEditor.tsx",
     "src/components/playground/ValidationResults.tsx",
-    "src/lib/schemas.ts"
+    "src/lib/schemas.ts",
+    "src/lib/__tests__/schemas.test.ts"
+  ],
+  "files_found": [
+    "src/app/playground/page.tsx",
+    "src/components/playground/SchemaSelector.tsx",
+    "src/components/playground/JsonEditor.tsx",
+    "src/components/playground/ValidationResults.tsx",
+    "src/lib/schemas.ts",
+    "src/lib/__tests__/schemas.test.ts"
+  ],
+  "files_missing": [],
+  "acceptance_criteria_results": [
+    {
+      "id": "ac-1",
+      "description": "Schema selector component exists and exports SchemaSelector",
+      "status": "pass",
+      "evidence": "src/components/playground/SchemaSelector.tsx contains 'export function SchemaSelector'",
+      "verification_type": "file_contains"
+    },
+    {
+      "id": "ac-2",
+      "description": "JSON editor component exists and accepts value/onChange props",
+      "status": "pass",
+      "evidence": "src/components/playground/JsonEditor.tsx contains 'export function JsonEditor'",
+      "verification_type": "file_contains"
+    },
+    {
+      "id": "ac-3",
+      "description": "Validation results component displays errors with paths",
+      "status": "pass",
+      "evidence": "src/components/playground/ValidationResults.tsx contains 'err.path'",
+      "verification_type": "file_contains"
+    },
+    {
+      "id": "ac-4",
+      "description": "Playground page wires schema selection, editing, and validation together",
+      "status": "pass",
+      "evidence": "src/app/playground/page.tsx contains 'validateAgainstSchema'",
+      "verification_type": "file_contains"
+    },
+    {
+      "id": "ac-5",
+      "description": "All 5 ZenKit schemas are registered and compilable",
+      "status": "pass",
+      "evidence": "5 schemas found (expected 5), 0 compilation errors",
+      "verification_type": "schema_count"
+    },
+    {
+      "id": "ac-6",
+      "description": "Example data exists and validates for each schema",
+      "status": "pass",
+      "evidence": "valid-handoff.json: valid against handoff.schema.json; schemas.ts registers 'handoff'; schemas.ts registers 'task'; schemas.ts registers 'audit'; schemas.ts registers 'checkpoint'; schemas.ts registers 'benchmark'",
+      "verification_type": "examples_valid"
+    },
+    {
+      "id": "ac-7",
+      "description": "Unit tests exist and cover schema validation",
+      "status": "pass",
+      "evidence": "src/lib/__tests__/schemas.test.ts exists",
+      "verification_type": "file_exists"
+    },
+    {
+      "id": "ac-8",
+      "description": "All schemas use consistent draft-07 format",
+      "status": "pass",
+      "evidence": "All 5 schemas use http://json-schema.org/draft-07/schema#",
+      "verification_type": "schemas_consistent"
+    }
   ],
   "stages": [
     {
       "name": "spec",
       "status": "pass",
       "duration_ms": 0,
-      "notes": "spec completed successfully"
+      "checks_run": 3,
+      "checks_passed": 3,
+      "details": [
+        "name present",
+        "8 acceptance criteria defined",
+        "2 limitations declared"
+      ]
     },
     {
-      "name": "plan",
+      "name": "schemas",
       "status": "pass",
-      "duration_ms": 0,
-      "notes": "plan completed successfully"
+      "duration_ms": 41,
+      "checks_run": 6,
+      "checks_passed": 6,
+      "details": [
+        "5 schemas compiled, 0 errors",
+        "All 5 schemas use http://json-schema.org/draft-07/schema#"
+      ]
     },
     {
       "name": "build",
       "status": "pass",
       "duration_ms": 0,
-      "notes": "build completed successfully"
+      "checks_run": 6,
+      "checks_passed": 6,
+      "details": [
+        "src/app/playground/page.tsx exists",
+        "src/components/playground/SchemaSelector.tsx exists",
+        "src/components/playground/JsonEditor.tsx exists",
+        "src/components/playground/ValidationResults.tsx exists",
+        "src/lib/schemas.ts exists",
+        "src/lib/__tests__/schemas.test.ts exists"
+      ]
     },
     {
       "name": "audit",
       "status": "pass",
-      "duration_ms": 38,
-      "notes": "audit completed successfully"
-    },
-    {
-      "name": "checkpoint",
-      "status": "pass",
       "duration_ms": 0,
-      "notes": "checkpoint completed successfully"
-    },
-    {
-      "name": "ship",
-      "status": "pass",
-      "duration_ms": 0,
-      "notes": "ship completed successfully"
+      "checks_run": 8,
+      "checks_passed": 8,
+      "details": [
+        "[PASS] ac-1: src/components/playground/SchemaSelector.tsx contains 'export function SchemaSelector'",
+        "[PASS] ac-2: src/components/playground/JsonEditor.tsx contains 'export function JsonEditor'",
+        "[PASS] ac-3: src/components/playground/ValidationResults.tsx contains 'err.path'",
+        "[PASS] ac-4: src/app/playground/page.tsx contains 'validateAgainstSchema'",
+        "[PASS] ac-5: 5 schemas found (expected 5), 0 compilation errors",
+        "[PASS] ac-6: valid-handoff.json: valid against handoff.schema.json; schemas.ts registers 'handoff'; schemas.ts registers 'task'; schemas.ts registers 'audit'; schemas.ts registers 'checkpoint'; schemas.ts registers 'benchmark'",
+        "[PASS] ac-7: src/lib/__tests__/schemas.test.ts exists",
+        "[PASS] ac-8: All 5 schemas use http://json-schema.org/draft-07/schema#"
+      ]
     }
   ],
+  "validation_summary": {
+    "total_criteria": 8,
+    "criteria_passed": 8,
+    "criteria_failed": 0,
+    "schemas_valid": true,
+    "examples_valid": true
+  },
   "telemetry": {
-    "estimated_tokens": 34500,
-    "estimated_cost_usd": 0.2691,
-    "telemetry_source": "estimated"
-  },
-  "validation": {
-    "tests_run": 6,
-    "tests_passed": 6,
-    "tests_failed": 0,
-    "schema_valid": true,
-    "lint_clean": true
-  },
-  "retries": 0,
-  "uncertainty_notes": [
-    "Token counts are estimated based on feature complexity and acceptance criteria count",
-    "Cost estimate uses published API pricing; actual cost varies with caching and context",
-    "Stage durations reflect validation time only, not original implementation time"
-  ],
-  "artifacts": [
-    {
-      "path": "benchmark/feature-specs/schema-validator-playground.json",
-      "type": "spec"
+    "estimated": {
+      "tokens": 37500,
+      "cost_usd": 0.2925,
+      "basis": "Heuristic: 5000 base + 2500 per criterion, scaled by complexity"
     },
-    {
-      "path": "benchmark/results/svp-001-live.json",
-      "type": "result"
-    }
+    "actual": null
+  },
+  "uncertainty": [
+    "Token and cost figures are estimates — no actual API telemetry is captured by this runner",
+    "Acceptance criteria verify code structure and schema validity, not runtime UI behavior",
+    "Stage durations reflect verification time, not original implementation time"
+  ],
+  "limitations": [
+    "Acceptance criteria verify code structure and schema validity, not runtime UI behavior",
+    "UI interaction testing (click flows, keyboard navigation) requires browser automation not included here"
   ]
 }

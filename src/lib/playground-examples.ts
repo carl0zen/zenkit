@@ -135,35 +135,58 @@ export const exampleData: Record<SchemaName, object> = {
 
   benchmark: {
     benchmark_id: "bench-example-001",
+    version: "0.2.0",
+    mode: "zenkit",
     task_name: "Example Feature Benchmark",
     feature_spec: "benchmark/feature-specs/example.json",
-    start_time: "2026-04-11T10:00:00Z",
-    end_time: "2026-04-11T10:12:00Z",
+    started_at: "2026-04-11T10:00:00Z",
+    completed_at: "2026-04-11T10:12:00Z",
     duration_ms: 720000,
     status: "pass",
-    files_changed: ["src/example.ts", "src/example.test.ts"],
-    stages: [
-      { name: "spec", status: "pass", duration_ms: 30000, notes: "Feature spec validated" },
-      { name: "plan", status: "pass", duration_ms: 45000, notes: "2 tasks identified" },
-      { name: "build", status: "pass", duration_ms: 480000, notes: "Implementation complete" },
-      { name: "audit", status: "pass", duration_ms: 90000, notes: "No critical findings" },
-      { name: "ship", status: "pass", duration_ms: 75000, notes: "All gates passed" }
+    expected_files: ["src/example.ts", "src/example.test.ts"],
+    files_found: ["src/example.ts", "src/example.test.ts"],
+    files_missing: [],
+    acceptance_criteria_results: [
+      {
+        id: "ac-1",
+        description: "Module exports expected function",
+        status: "pass",
+        evidence: "src/example.ts contains 'export function'",
+        verification_type: "file_contains"
+      },
+      {
+        id: "ac-2",
+        description: "Tests exist for the module",
+        status: "pass",
+        evidence: "src/example.test.ts exists",
+        verification_type: "file_exists"
+      }
     ],
+    stages: [
+      { name: "spec", status: "pass", duration_ms: 30000, checks_run: 3, checks_passed: 3, details: ["name present", "2 criteria defined", "1 limitation declared"] },
+      { name: "build", status: "pass", duration_ms: 45000, checks_run: 2, checks_passed: 2, details: ["src/example.ts exists", "src/example.test.ts exists"] },
+      { name: "audit", status: "pass", duration_ms: 90000, checks_run: 2, checks_passed: 2, details: ["[PASS] ac-1", "[PASS] ac-2"] }
+    ],
+    validation_summary: {
+      total_criteria: 2,
+      criteria_passed: 2,
+      criteria_failed: 0,
+      schemas_valid: true,
+      examples_valid: true
+    },
     telemetry: {
-      estimated_tokens: 35000,
-      estimated_cost_usd: 0.53,
-      telemetry_source: "estimated"
+      estimated: {
+        tokens: 35000,
+        cost_usd: 0.53,
+        basis: "Heuristic: 5000 base + 2500 per criterion, scaled by complexity"
+      },
+      actual: null
     },
-    validation: {
-      tests_run: 8,
-      tests_passed: 8,
-      tests_failed: 0,
-      schema_valid: true,
-      lint_clean: true
-    },
-    retries: 0,
-    uncertainty_notes: [
-      "Token and cost figures are estimates based on typical prompt sizes"
+    uncertainty: [
+      "Token and cost figures are estimates — no actual API telemetry captured"
+    ],
+    limitations: [
+      "This is illustrative example data, not from a real benchmark run"
     ]
   },
 }

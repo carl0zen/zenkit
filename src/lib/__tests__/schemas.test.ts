@@ -98,14 +98,14 @@ describe('Schema Validation', () => {
         expect(result.valid).toBe(false)
       })
 
-      it('rejects benchmark with missing validation', () => {
+      it('rejects benchmark with missing required fields', () => {
         const result = validateAgainstSchema('benchmark', {
           benchmark_id: 'test',
           task_name: 'Test',
-          start_time: '2026-04-11T10:00:00Z',
-          end_time: '2026-04-11T10:01:00Z',
+          started_at: '2026-04-11T10:00:00Z',
+          completed_at: '2026-04-11T10:01:00Z',
           status: 'pass',
-          // missing: validation
+          // missing: version, mode, validation_summary, acceptance_criteria_results
         })
         expect(result.valid).toBe(false)
       })
