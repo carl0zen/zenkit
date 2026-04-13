@@ -6,6 +6,7 @@ import { WhyLightweight } from '@/components/WhyLightweight'
 import { BenchmarkSection } from '@/components/BenchmarkSection'
 import { BenchmarkSummary } from '@/components/BenchmarkSummary'
 import { ComparisonSection } from '@/components/ComparisonSection'
+import { WorkflowDiagram } from '@/components/WorkflowDiagram'
 import { HandoffExample } from '@/components/HandoffExample'
 import { SelfAudit } from '@/components/SelfAudit'
 import { OpenSource } from '@/components/OpenSource'
@@ -24,6 +25,7 @@ export default function Home() {
       <BenchmarkSection />
       <BenchmarkSummary />
       <ComparisonSection />
+      <WorkflowDiagram />
       <HandoffExample />
       <SelfAudit />
       <OpenSource />
