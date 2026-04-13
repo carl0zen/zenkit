@@ -41,12 +41,25 @@ deliverable, risks, open_questions, next_agent
 
 ```bash
 npm install
+
+# CLI
+npm run zenkit status           # Project health check
+npm run zenkit validate handoff data.json  # Validate against schema
+npm run zenkit benchmark:all    # Run all 4 benchmark specs
+
+# Development
 npm run dev              # Landing page at localhost:3000, playground at /playground
-npm test                 # 16 schema validation tests
-npm run validate:schemas # Verify all 5 JSON schemas compile
-npm run benchmark        # Run acceptance-criteria benchmark
-npm run benchmark:report # Generate markdown report from results
-npm run benchmark:compare # Compare zenkit vs baseline results
+npm test                 # 32 unit tests
+npm run test:e2e         # 12 Playwright E2E browser tests
+npm run lint             # ESLint
+npm run build            # Production build
+
+# Benchmarking
+npm run benchmark        # Single spec (schema validator playground)
+npm run benchmark:all    # All 4 specs (101 checks, 35 criteria)
+npm run benchmark:report # Markdown report from latest result
+npm run benchmark:compare # ZenKit vs baseline comparison
+npm run benchmark:visualize -- --summary  # Mermaid workflow diagram
 ```
 
 ## Workflow
@@ -63,13 +76,24 @@ Lateral: `/refactor` (behavior-preserving improvement), `/handoff` (agent-to-age
 
 ZenKit benchmarks verify acceptance criteria against the actual implementation — not file existence, not narrative claims.
 
-### What the benchmark actually checks
+### Current coverage
 
-The v0.2 runner verifies:
-- **Feature spec validity** — name, criteria, and limitations are present
-- **Schema compilation** — all JSON schemas compile without errors, consistent draft version
-- **Expected files** — each file in the spec exists in the repo
-- **Acceptance criteria** — each criterion runs a verification step (file_contains, schema_count, examples_valid, etc.)
+4 feature specs with 35 acceptance criteria and 101 total checks:
+
+| Spec | Criteria | Checks |
+|------|----------|--------|
+| Schema Validator Playground | 8 | 23 |
+| Handoff Contract System | 9 | 22 |
+| Protocol Completeness | 10 | 35 |
+| Self-Audit | 8 | 21 |
+
+### Verification types
+
+- `file_exists` — File is present
+- `file_contains` — File contains a specific string pattern
+- `schema_count` — Expected number of schemas compile
+- `examples_valid` — Fixture data validates against schemas
+- `schemas_consistent` — All schemas use the same JSON Schema draft
 
 ### Telemetry honesty
 
@@ -79,21 +103,42 @@ The v0.2 runner verifies:
 
 ### Baseline comparison
 
-ZenKit supports `zenkit` and `baseline` benchmark modes for structural comparison. Current comparison data is **illustrative** — both modes verify the same codebase. A meaningful comparison requires A/B workflow execution, which is documented but not yet implemented.
-
-```bash
-npm run benchmark          # zenkit mode
-npm run benchmark:baseline # baseline mode
-npm run benchmark:compare  # side-by-side comparison
-```
+ZenKit supports `zenkit` and `baseline` modes. Current comparison data is **illustrative** — both modes verify the same codebase. A meaningful comparison requires A/B workflow execution.
 
 ### Self-audit
 
-ZenKit uses its own benchmark system to audit itself. This is useful for testing expressiveness but is not self-certification. See [docs/self-audit.md](docs/self-audit.md) for safeguards and limitations.
+ZenKit uses its own benchmark system to audit itself. This is structured introspection, not self-certification. See [docs/self-audit.md](docs/self-audit.md).
+
+### Workflow visualization
+
+```bash
+npm run benchmark:visualize -- --summary  # Mermaid diagram of all specs
+npm run benchmark:visualize               # Mermaid diagram of single result
+```
 
 ## Schema Validator Playground
 
 Interactive tool at `/playground` for validating JSON against ZenKit schemas. Client-side validation with Ajv, pre-loaded examples, detailed error paths.
+
+## CLI
+
+```bash
+npm run zenkit help                         # All commands
+npm run zenkit status                       # Project health
+npm run zenkit validate <schema> <file>     # Validate JSON
+npm run zenkit validate:all                 # Check all schemas compile
+npm run zenkit benchmark [spec]             # Run single benchmark
+npm run zenkit benchmark:all                # Run all benchmarks
+npm run zenkit init [dir]                   # Scaffold ZenKit into a project
+```
+
+## Test coverage
+
+| Layer | Tests | What it covers |
+|-------|-------|----------------|
+| Unit (Vitest) | 32 | Schema validation, example data, edge cases, benchmark result structure |
+| E2E (Playwright) | 12 | Playground UI, schema selection, validation flows, landing page |
+| Benchmarks | 101 checks | Code structure, schema compilation, documentation, self-audit |
 
 ## Extending
 
@@ -114,6 +159,10 @@ Custom schemas: add to `schemas/`, register in `src/lib/schemas.ts`, add example
 5. **Low drift** — Commands and handoffs force consistency.
 6. **Benchmarkable** — Acceptance criteria, not file existence.
 
+## CI
+
+GitHub Actions runs on push/PR to main: lint, unit tests, schema validation, all benchmarks, build, E2E tests. Benchmark results uploaded as artifacts.
+
 ## Documentation
 
 - [Philosophy](docs/philosophy.md) — Design principles.
@@ -121,8 +170,8 @@ Custom schemas: add to `schemas/`, register in `src/lib/schemas.ts`, add example
 - [Command Model](docs/command-model.md) — The 8 commands and output contract.
 - [Agent Contract](docs/agent-contract.md) — Agent definitions and handoff chains.
 - [Benchmarking](docs/benchmarking.md) — The benchmark system.
-- [Self-Audit](docs/self-audit.md) — How ZenKit audits itself and the limits of self-verification.
-- [Roadmap](docs/roadmap.md) — Future directions.
+- [Self-Audit](docs/self-audit.md) — Self-verification and its limits.
+- [Roadmap](docs/roadmap.md) — What's done and what's next.
 
 ## License
 

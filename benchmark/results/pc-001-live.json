@@ -1,12 +1,12 @@
 {
-  "benchmark_id": "bench-pc-001-1776059642071",
+  "benchmark_id": "bench-pc-001-1776122308479",
   "version": "0.2.0",
   "mode": "zenkit",
   "task_name": "Protocol Completeness",
   "feature_spec": "benchmark/feature-specs/protocol-completeness.json",
-  "started_at": "2026-04-13T05:54:02.000Z",
-  "completed_at": "2026-04-13T05:54:02.071Z",
-  "duration_ms": 71,
+  "started_at": "2026-04-13T23:18:28.405Z",
+  "completed_at": "2026-04-13T23:18:28.479Z",
+  "duration_ms": 74,
   "status": "pass",
   "expected_files": [
     "commands/spec.md",
@@ -133,7 +133,7 @@
     {
       "name": "schemas",
       "status": "pass",
-      "duration_ms": 45,
+      "duration_ms": 47,
       "checks_run": 6,
       "checks_passed": 6,
       "details": [
