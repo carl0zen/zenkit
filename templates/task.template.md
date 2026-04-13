@@ -1,55 +1,19 @@
-# {{task_title}}
+# {{Task Name}}
 
-> {{one_line_summary}}
-
-## Metadata
-| Field | Value |
-|-------|-------|
-| **ID** | {{task_id}} |
-| **Status** | {{status}} |
-| **Priority** | {{priority}} |
-| **Created** | {{created_date}} |
-| **Updated** | {{updated_date}} |
-| **Assigned Agent** | {{assigned_agent}} |
-| **Parent Task** | {{parent_task_id}} |
-
-## Description
-{{detailed_description}}
-
-## Acceptance Criteria
-- [ ] {{criterion_one}}
-- [ ] {{criterion_two}}
-- [ ] {{criterion_three}}
+**ID:** {{task_id}}
+**Command:** {{spec|plan|build|audit|refactor|handoff|checkpoint|ship}}
+**Status:** {{pending|in_progress|blocked|completed|failed|skipped}}
+**Agent:** {{assigned_agent}}
 
 ## Context
-{{background_information_and_motivation}}
+{{what_is_being_done_and_why}}
 
-## Assumptions
-- {{assumption_one}}
-- {{assumption_two}}
+## Acceptance Criteria
+- {{criterion_1}}
+- {{criterion_2}}
 
 ## Constraints
-- {{constraint_one}}
-- {{constraint_two}}
+- {{constraint_1}}
 
 ## Dependencies
-| Task ID | Description | Status |
-|---------|-------------|--------|
-| {{dep_task_id}} | {{dep_description}} | {{dep_status}} |
-
-## Subtasks
-- [ ] {{subtask_one}}
-- [ ] {{subtask_two}}
-- [ ] {{subtask_three}}
-
-## Risks
-| Risk | Impact | Mitigation |
-|------|--------|------------|
-| {{risk_description}} | {{impact_level}} | {{mitigation_plan}} |
-
-## Open Questions
-- {{question_one}}
-- {{question_two}}
-
-## Notes
-{{additional_notes}}
+- {{dependency_task_id}}
