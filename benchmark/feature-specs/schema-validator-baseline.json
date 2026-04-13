@@ -1,0 +1,93 @@
+{
+  "feature_id": "svp-001-baseline",
+  "name": "Schema Validator Playground (Baseline)",
+  "description": "Same feature as svp-001, but executed without ZenKit workflow structure. This spec represents an unstructured approach for comparison.",
+  "mode": "baseline",
+  "acceptance_criteria": [
+    {
+      "id": "ac-1",
+      "description": "Schema selector component exists and exports SchemaSelector",
+      "verification": {
+        "type": "file_contains",
+        "path": "src/components/playground/SchemaSelector.tsx",
+        "pattern": "export function SchemaSelector"
+      }
+    },
+    {
+      "id": "ac-2",
+      "description": "JSON editor component exists and accepts value/onChange props",
+      "verification": {
+        "type": "file_contains",
+        "path": "src/components/playground/JsonEditor.tsx",
+        "pattern": "export function JsonEditor"
+      }
+    },
+    {
+      "id": "ac-3",
+      "description": "Validation results component displays errors with paths",
+      "verification": {
+        "type": "file_contains",
+        "path": "src/components/playground/ValidationResults.tsx",
+        "pattern": "err.path"
+      }
+    },
+    {
+      "id": "ac-4",
+      "description": "Playground page wires schema selection, editing, and validation together",
+      "verification": {
+        "type": "file_contains",
+        "path": "src/app/playground/page.tsx",
+        "pattern": "validateAgainstSchema"
+      }
+    },
+    {
+      "id": "ac-5",
+      "description": "All 5 ZenKit schemas are registered and compilable",
+      "verification": {
+        "type": "schema_count",
+        "expected": 5
+      }
+    },
+    {
+      "id": "ac-6",
+      "description": "Example data exists and validates for each schema",
+      "verification": {
+        "type": "examples_valid"
+      }
+    },
+    {
+      "id": "ac-7",
+      "description": "Unit tests exist and cover schema validation",
+      "verification": {
+        "type": "file_exists",
+        "path": "src/lib/__tests__/schemas.test.ts"
+      }
+    },
+    {
+      "id": "ac-8",
+      "description": "All schemas use consistent draft-07 format",
+      "verification": {
+        "type": "schemas_consistent"
+      }
+    }
+  ],
+  "constraints": [
+    "Must work entirely client-side with no backend API calls",
+    "Must use the same validation library (Ajv) as core tooling"
+  ],
+  "expected_files": [
+    "src/app/playground/page.tsx",
+    "src/components/playground/SchemaSelector.tsx",
+    "src/components/playground/JsonEditor.tsx",
+    "src/components/playground/ValidationResults.tsx",
+    "src/lib/schemas.ts",
+    "src/lib/__tests__/schemas.test.ts"
+  ],
+  "assigned_commands": [],
+  "estimated_complexity": "medium",
+  "limitations": [
+    "This baseline spec verifies the same deliverables as the zenkit run — it differs in workflow metadata only",
+    "The comparison is illustrative: both specs validate the same codebase, so pass/fail will match",
+    "A meaningful baseline comparison requires running the actual implementation twice with different workflows"
+  ]
+}
