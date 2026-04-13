@@ -1,0 +1,73 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://zenkit.dev/schemas/feature-spec.schema.json",
+  "title": "ZenKit Feature Spec",
+  "description": "Machine-readable feature specification for ZenKit benchmarks.",
+  "type": "object",
+  "required": ["feature_id", "name", "description", "mode", "acceptance_criteria", "constraints", "expected_files", "limitations"],
+  "properties": {
+    "feature_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string"
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["zenkit", "baseline"]
+    },
+    "acceptance_criteria": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "description", "verification"],
+        "properties": {
+          "id": { "type": "string" },
+          "description": { "type": "string" },
+          "verification": {
+            "type": "object",
+            "required": ["type"],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["file_exists", "file_contains", "schema_count", "examples_valid", "schemas_consistent"]
+              },
+              "path": { "type": "string" },
+              "pattern": { "type": "string" },
+              "expected": { "type": "integer" }
+            }
+          }
+        }
+      }
+    },
+    "constraints": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "expected_files": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "assigned_commands": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "estimated_complexity": {
+      "type": "string",
+      "enum": ["low", "medium", "high"]
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string" },
+      "description": "What this spec does NOT verify. Required — specs must be honest about scope."
+    }
+  },
+  "additionalProperties": false
+}

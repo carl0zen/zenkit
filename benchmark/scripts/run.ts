@@ -280,11 +280,28 @@ function verifyCriterion(criterion: AcceptanceCriterion): CriterionResult {
 
 // --- Stage Runners ---
 
-function runSpecStage(spec: FeatureSpec): StageResult {
+function runSpecStage(spec: FeatureSpec, specPath: string): StageResult {
   const start = Date.now()
   const checks: string[] = []
   let passed = 0
-  const total = 3
+  const total = 4
+
+  // Validate spec against feature-spec.schema.json
+  const specSchemaPath = resolve('schemas/feature-spec.schema.json')
+  if (fs.existsSync(specSchemaPath)) {
+    const localAjv = new Ajv({ allErrors: true, strict: false })
+    addFormats(localAjv)
+    const specSchema = JSON.parse(fs.readFileSync(specSchemaPath, 'utf-8'))
+    const validate = localAjv.compile(specSchema)
+    const specData = JSON.parse(fs.readFileSync(path.resolve(specPath), 'utf-8'))
+    if (validate(specData)) {
+      passed++; checks.push('spec validates against feature-spec.schema.json')
+    } else {
+      checks.push(`FAIL: spec schema validation — ${validate.errors?.map(e => e.message).join(', ')}`)
+    }
+  } else {
+    checks.push('SKIP: feature-spec.schema.json not found')
+  }
 
   if (spec.name.length > 0) { passed++; checks.push('name present') }
   else checks.push('FAIL: name empty')
@@ -405,7 +422,7 @@ async function main() {
   const stages: StageResult[] = []
 
   // 1. Spec validation
-  const specStage = runSpecStage(spec)
+  const specStage = runSpecStage(spec, resolvedPath)
   stages.push(specStage)
   console.log(`  [${specStage.status}] spec (${specStage.checks_passed}/${specStage.checks_run})`)
 

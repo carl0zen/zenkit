@@ -12,7 +12,7 @@
     {
       "id": "pc-2",
       "description": "All 5 schemas compile",
-      "verification": { "type": "schema_count", "expected": 5 }
+      "verification": { "type": "schema_count", "expected": 6 }
     },
     {
       "id": "pc-3",

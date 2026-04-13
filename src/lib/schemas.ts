@@ -5,6 +5,7 @@ import taskSchema from '../../schemas/task.schema.json'
 import auditSchema from '../../schemas/audit.schema.json'
 import checkpointSchema from '../../schemas/checkpoint.schema.json'
 import benchmarkSchema from '../../schemas/benchmark.schema.json'
+import featureSpecSchema from '../../schemas/feature-spec.schema.json'
 
 const ajv = new Ajv({ allErrors: true, strict: false })
 addFormats(ajv)
@@ -15,6 +16,7 @@ export const schemas = {
   audit: auditSchema,
   checkpoint: checkpointSchema,
   benchmark: benchmarkSchema,
+  'feature-spec': featureSpecSchema,
 } as const
 
 export type SchemaName = keyof typeof schemas
@@ -25,6 +27,7 @@ const validators = {
   audit: ajv.compile(auditSchema),
   checkpoint: ajv.compile(checkpointSchema),
   benchmark: ajv.compile(benchmarkSchema),
+  'feature-spec': ajv.compile(featureSpecSchema),
 }
 
 export interface ValidationResult {

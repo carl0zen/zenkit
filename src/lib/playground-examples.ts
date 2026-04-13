@@ -189,4 +189,30 @@ export const exampleData: Record<SchemaName, object> = {
       "This is illustrative example data, not from a real benchmark run"
     ]
   },
+
+  'feature-spec': {
+    feature_id: "example-001",
+    name: "Example Feature",
+    description: "A minimal feature spec demonstrating the format.",
+    mode: "zenkit",
+    acceptance_criteria: [
+      {
+        id: "ex-1",
+        description: "Main module exists",
+        verification: { type: "file_exists", path: "src/example.ts" }
+      },
+      {
+        id: "ex-2",
+        description: "Module exports expected function",
+        verification: { type: "file_contains", path: "src/example.ts", pattern: "export function" }
+      }
+    ],
+    constraints: ["Must work without external dependencies"],
+    expected_files: ["src/example.ts"],
+    assigned_commands: ["spec", "build", "audit"],
+    estimated_complexity: "low",
+    limitations: [
+      "This is an illustrative example, not a real feature spec"
+    ]
+  },
 }

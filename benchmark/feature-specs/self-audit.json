@@ -7,7 +7,7 @@
     {
       "id": "sa-1",
       "description": "All 5 JSON schemas compile without errors",
-      "verification": { "type": "schema_count", "expected": 5 }
+      "verification": { "type": "schema_count", "expected": 6 }
     },
     {
       "id": "sa-2",

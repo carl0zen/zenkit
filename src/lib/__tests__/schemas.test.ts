@@ -11,7 +11,8 @@ describe('Schema Validation', () => {
       expect(names).toContain('audit')
       expect(names).toContain('checkpoint')
       expect(names).toContain('benchmark')
-      expect(names).toHaveLength(5)
+      expect(names).toContain('feature-spec')
+      expect(names).toHaveLength(6)
     })
   })
 
@@ -29,7 +30,7 @@ describe('Schema Validation', () => {
 
   describe('validateAgainstSchema', () => {
     describe('with valid example data', () => {
-      const cases: SchemaName[] = ['handoff', 'task', 'audit', 'checkpoint', 'benchmark']
+      const cases: SchemaName[] = ['handoff', 'task', 'audit', 'checkpoint', 'benchmark', 'feature-spec']
       for (const schemaName of cases) {
         it(`validates ${schemaName} example data successfully`, () => {
           const result = validateAgainstSchema(schemaName, exampleData[schemaName])
