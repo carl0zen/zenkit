@@ -1,64 +1,37 @@
-# ZenKit Benchmarking
+# Benchmarking
 
-ZenKit's benchmark system measures what AI agents actually produce, not what they claim to produce. The distinction matters: an agent that says "I built a complete REST API" is making a claim. A benchmark that checks for route definitions, schema validation, and passing tests is checking reality.
+ZenKit benchmarks verify acceptance criteria against the actual implementation. The distinction: checking that a file contains `export function SchemaSelector` is verification. Checking that a file exists is weaker. Claiming "the feature works" is not verification at all.
 
-## What "Certainty" Means
+## What the runner checks
 
-In ZenKit, certainty is the presence of explicit, validated artifacts. A feature is "done" when:
+The v0.2 benchmark runner executes four stages:
 
-- The deliverable exists and parses.
-- The deliverable validates against its output schema.
-- The audit rubrics pass.
-- Open questions are either resolved or explicitly deferred.
+1. **Spec validation.** The feature spec has a name, acceptance criteria, and declared limitations.
+2. **Schema compilation.** All JSON schemas compile without errors. All use the same draft version.
+3. **Build verification.** Every file listed in `expected_files` exists in the repo.
+4. **Acceptance criteria audit.** Each criterion runs a specific verification step:
+   - `file_exists` — file is present
+   - `file_contains` — file contains a specific string
+   - `schema_count` — expected number of schemas compile
+   - `examples_valid` — fixture data validates against schemas
+   - `schemas_consistent` — all schemas use the same JSON Schema draft
 
-There is no confidence score. There is no percentage. There is pass or fail, with detailed findings for failures.
+Each check produces `evidence` — a string describing what was actually found. Results are `pass` or `fail`, never ambiguous.
 
-## How the Benchmark Runner Works
+## Telemetry
 
-The benchmark runner executes a workflow against a feature spec and measures the results. The process:
+- **Estimated:** Token counts and costs computed from a heuristic (documented in the `basis` field). These are estimates, not measurements.
+- **Actual:** Null when no API instrumentation is available. The schema enforces this: `actual` is either a real measurement or explicitly null.
 
-1. **Load the feature spec.** The spec defines what should be built, including acceptance criteria.
-2. **Run the workflow.** Commands execute in sequence: plan, build, audit. Each command's output is captured.
-3. **Validate outputs.** Every command output is checked against its schema. Schema violations are failures.
-4. **Apply rubrics.** Audit rubrics evaluate the deliverables against acceptance criteria.
-5. **Collect telemetry.** Duration, token usage (if available), and artifact sizes are recorded.
-6. **Produce the report.** A structured JSON report with per-command results, rubric scores, and telemetry.
+## Comparison mode
 
-## Validated vs. Inferred Data
+Specs include a `mode` field: `zenkit` or `baseline`. Both modes run the same verification checks against the same codebase. The structural difference is in workflow metadata.
 
-ZenKit distinguishes between two categories of data in benchmark results:
+Current comparison data is **illustrative**. Both runs verify the same already-built feature, so pass/fail parity is expected. A meaningful comparison requires executing the implementation process twice with different workflow structures and measuring drift, retries, and rework.
 
-- **Validated**: Data that was directly measured or verified. Schema compliance is validated. File existence is validated. Test pass/fail is validated.
-- **Inferred**: Data that was estimated or derived. Token counts may be inferred from output length if the provider does not report them. Cost estimates are always inferred based on published pricing. Complexity scores are inferred from heuristics.
+## Limitations
 
-Every data point in a benchmark report is tagged as `validated` or `inferred`. This prevents the common mistake of treating estimates as measurements.
-
-## Writing Feature Specs for Benchmarks
-
-A benchmark feature spec includes:
-
-- **description**: What the feature does.
-- **acceptance_criteria**: A list of concrete, testable conditions.
-- **constraints**: Technical boundaries (language, framework, performance requirements).
-- **expected_artifacts**: What files or structures the build should produce.
-
-Good acceptance criteria are binary -- they pass or fail. "The API should be fast" is not testable. "The API responds in under 200ms for the list endpoint" is testable.
-
-## Running Benchmarks
-
-```bash
-zenkit benchmark run --spec features/my-feature.json
-zenkit benchmark run --spec features/ --all
-zenkit benchmark report --output results.json
-```
-
-## Reading Results
-
-Benchmark results are structured JSON. Key fields:
-
-- **pass/fail**: Did the workflow complete and pass audit?
-- **rubric_scores**: Per-rubric pass/fail with findings.
-- **telemetry**: Duration, token usage (tagged validated/inferred), artifact counts.
-- **failures**: Specific schema violations, rubric failures, or missing artifacts.
-
-Results are diffable. Run the same spec twice and compare outputs to measure consistency. Run after a model change to measure regression.
+- Acceptance criteria verify code structure and schema validity, not runtime UI behavior.
+- UI interaction testing requires browser automation, which is not included.
+- Token estimates are heuristics, not measurements.
+- Self-audit benchmarks structure introspection but do not replace independent review.
