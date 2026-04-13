@@ -2,228 +2,126 @@
 
 **Disciplined workflows for coding agents.**
 
-ZenKit is a lightweight open-source protocol layer for AI-assisted software building. It provides commands, schemas, hooks, checkpoints, and handoffs without framework bloat.
+ZenKit is a lightweight open-source protocol layer for AI-assisted software building. Commands, schemas, hooks, checkpoints, and handoffs — without framework bloat.
 
-## What problem does ZenKit solve?
+## Problem
 
-Most AI-assisted development workflows share structural failures that have nothing to do with model capability:
+Most AI-assisted development workflows share structural failures unrelated to model capability:
 
 - **Drift** — Agents wander from the plan. Each step compounds divergence.
 - **Verbosity** — Workflows burn tokens on narration instead of producing artifacts.
 - **Hidden uncertainty** — Agents report success without distinguishing validated from assumed.
 - **Lost context** — Handoffs between agents lose assumptions, constraints, and decisions.
 
-ZenKit adds structure around your agent runtime — not a replacement for it. A shared vocabulary of commands, schemas, and contracts that make agent workflows predictable, auditable, and repeatable.
+ZenKit adds structure around your agent runtime. It does not replace it.
 
-## Core Architecture
+## Architecture
 
-ZenKit is built from six categories of plain-file artifacts:
+Six categories of plain-file artifacts:
 
 | Primitive | Purpose | Format |
 |-----------|---------|--------|
 | **Commands** | 8 workflow verbs: spec, plan, build, audit, refactor, handoff, checkpoint, ship | Markdown |
 | **Schemas** | Machine-validatable contracts for handoffs, tasks, audits, checkpoints, benchmarks | JSON Schema |
 | **Skills** | Reusable capabilities: architecture review, security audit, bug triage, prompt pruning | Markdown |
-| **Hooks** | Automatic validation at workflow boundaries (pre-change, post-change, pre-ship) | Markdown |
+| **Hooks** | Automatic validation at workflow boundaries | Markdown |
 | **Checkpoints** | State snapshots with gate conditions — validated facts vs. assumptions | JSON Schema |
-| **Rubrics** | Evaluation criteria for execution quality, verbosity, and architectural alignment | Markdown |
+| **Rubrics** | Evaluation criteria scored 0-10 | Markdown |
 
-### Standard Output Contract
+### Standard output contract
 
-Every command and agent produces output aligned to this shape:
-
-```
-context          — What is the current situation?
-assumptions      — What was assumed? (explicit, not hidden)
-constraints      — What bounds this work?
-decision         — What was decided and why?
-deliverable      — What was produced?
-risks            — What could go wrong?
-open_questions   — What remains unresolved?
-next_agent       — Who receives this handoff?
-```
-
-## Project Structure
+Every command produces output aligned to:
 
 ```
-zenkit/
-├── commands/        8 workflow commands (spec, plan, build, audit, refactor, handoff, checkpoint, ship)
-├── schemas/         JSON Schema definitions (handoff, task, audit, checkpoint, benchmark)
-├── skills/          7 reusable capabilities
-├── hooks/           3 workflow boundary validators
-├── agents/          9 specialist agent contracts
-├── rubrics/         3 evaluation rubrics
-├── templates/       Templates for new commands, skills, agents, tasks
-├── examples/        3 complete workflow walkthroughs
-├── benchmark/       Benchmark harness, feature specs, results, and scripts
-├── docs/            Architecture, philosophy, command model, agent contracts, benchmarking, roadmap
-└── src/             Next.js application (landing page + schema validator playground)
+context, assumptions, constraints, decision,
+deliverable, risks, open_questions, next_agent
 ```
 
 ## Quickstart
 
 ```bash
-# Install dependencies
 npm install
-
-# Run the dev server (landing page + playground)
-npm run dev
-
-# Validate all schemas
-npm run validate:schemas
-
-# Run tests
-npm test
-
-# Run benchmark
-npm run benchmark
-
-# Generate benchmark report
-npm run benchmark:report
+npm run dev              # Landing page at localhost:3000, playground at /playground
+npm test                 # 16 schema validation tests
+npm run validate:schemas # Verify all 5 JSON schemas compile
+npm run benchmark        # Run acceptance-criteria benchmark
+npm run benchmark:report # Generate markdown report from results
+npm run benchmark:compare # Compare zenkit vs baseline results
 ```
 
-## Workflow: How Commands Chain Together
+## Workflow
 
 ```
 /spec → /plan → /build → /audit → /checkpoint → /ship
                   ↑         |
-                  └─────────┘  (audit loop: fix and re-audit)
+                  └─────────┘  (audit loop)
 ```
 
-1. **`/spec`** — Define what to build. Acceptance criteria, constraints, scope boundaries.
-2. **`/plan`** — Break into tasks. Identify dependencies, assign agents.
-3. **`/build`** — Implement the plan. Produce code with validation status.
-4. **`/audit`** — Review for correctness, security, style. Score with rubrics.
-5. **`/checkpoint`** — Save state. Record what's validated vs. assumed.
-6. **`/ship`** — Final gates. Pre-ship hooks. Release.
-
-Lateral commands available at any stage:
-- **`/refactor`** — Improve without behavior change (requires green tests).
-- **`/handoff`** — Transfer context between agents with full contract.
-
-## Agents and Handoffs
-
-ZenKit defines 9 specialist agent contracts with bounded responsibility:
-
-```
-product-manager → system-architect → backend-architect → qa-test-engineer
-                                   → frontend-architect → ux-engineer → qa-test-engineer
-                                                                         → security-specialist
-                                                                         → implementation-auditor
-                                                                         → technical-writer
-```
-
-Each agent has:
-- **Responsibility** — What it owns.
-- **Boundaries** — What it must NOT do.
-- **Input/Output Contract** — Aligned to the standard handoff schema.
-- **Handoff Targets** — Who receives its work.
-
-Handoffs are validated against `handoff.schema.json` before the next agent begins. Invalid handoffs are rejected.
+Lateral: `/refactor` (behavior-preserving improvement), `/handoff` (agent-to-agent context transfer).
 
 ## Benchmarking
 
-ZenKit proves certainty through explicit artifacts, not claims.
+ZenKit benchmarks verify acceptance criteria against the actual implementation — not file existence, not narrative claims.
 
-### What the benchmark measures
+### What the benchmark actually checks
 
-| Metric | Description |
-|--------|-------------|
-| Task name | Feature being benchmarked |
-| Start/end time | Execution window |
-| Files changed | Concrete deliverables |
-| Stage results | Pass/fail per workflow stage |
-| Token estimate | Estimated token consumption |
-| Cost estimate | Estimated API cost |
-| Test results | Tests run, passed, failed |
-| Schema validation | Whether schemas validate |
-| Uncertainty notes | What remains inferred |
+The v0.2 runner verifies:
+- **Feature spec validity** — name, criteria, and limitations are present
+- **Schema compilation** — all JSON schemas compile without errors, consistent draft version
+- **Expected files** — each file in the spec exists in the repo
+- **Acceptance criteria** — each criterion runs a verification step (file_contains, schema_count, examples_valid, etc.)
 
 ### Telemetry honesty
 
-ZenKit distinguishes **actual** from **estimated** telemetry:
+- **Estimated** data includes a `basis` field explaining the heuristic.
+- **Actual** telemetry is `null` when no API instrumentation is available. Never fabricated.
+- Every result includes `uncertainty` and `limitations` arrays.
 
-- `telemetry_source: "actual"` — Real instrumentation data.
-- `telemetry_source: "estimated"` — Calculated from feature complexity.
+### Baseline comparison
 
-Estimated telemetry is never presented as actual. The benchmark result schema enforces this distinction.
-
-### Running a benchmark
+ZenKit supports `zenkit` and `baseline` benchmark modes for structural comparison. Current comparison data is **illustrative** — both modes verify the same codebase. A meaningful comparison requires A/B workflow execution, which is documented but not yet implemented.
 
 ```bash
-# Run with default feature spec
-npm run benchmark
-
-# Run with specific spec
-npx tsx benchmark/scripts/run.ts benchmark/feature-specs/schema-validator-playground.json
-
-# Generate markdown report from result
-npm run benchmark:report
+npm run benchmark          # zenkit mode
+npm run benchmark:baseline # baseline mode
+npm run benchmark:compare  # side-by-side comparison
 ```
+
+### Self-audit
+
+ZenKit uses its own benchmark system to audit itself. This is useful for testing expressiveness but is not self-certification. See [docs/self-audit.md](docs/self-audit.md) for safeguards and limitations.
 
 ## Schema Validator Playground
 
-ZenKit includes an interactive web-based tool for validating JSON data against ZenKit schemas. Available at `/playground` when running the dev server.
+Interactive tool at `/playground` for validating JSON against ZenKit schemas. Client-side validation with Ajv, pre-loaded examples, detailed error paths.
 
-Features:
-- Select from all 5 ZenKit schemas
-- Pre-loaded example data for each schema
-- Client-side validation with Ajv
-- Detailed error messages with JSON paths
-- Collapsible schema definition viewer
+## Extending
 
-## Extending ZenKit
+```
+templates/command.template.md  → commands/
+templates/skill.template.md   → skills/
+templates/agent.template.md   → agents/
+```
 
-### Add a new command
-
-1. Copy `templates/command.template.md`
-2. Fill in the template fields
-3. Place in `commands/`
-
-### Add a new skill
-
-1. Copy `templates/skill.template.md`
-2. Define trigger conditions, input/output, quality criteria
-3. Place in `skills/`
-
-### Add a new agent
-
-1. Copy `templates/agent.template.md`
-2. Define responsibility, boundaries, handoff targets
-3. Place in `agents/`
-
-### Add a custom schema
-
-1. Write a JSON Schema in `schemas/`
-2. Register it in `src/lib/schemas.ts`
-3. Add example data in `src/lib/playground-examples.ts`
+Custom schemas: add to `schemas/`, register in `src/lib/schemas.ts`, add example data in `src/lib/playground-examples.ts`.
 
 ## Design Principles
 
-1. **Thin over grand** — Smallest architecture that clearly expresses the idea.
+1. **Thin over grand** — Smallest architecture that works.
 2. **Protocol over persona** — Schemas and contracts, not theatrical agent identities.
-3. **Bounded autonomy over fake certainty** — Assumptions are explicit. Uncertainty is recorded.
-4. **Validation over narration** — Tests, schemas, and artifacts over prose claims.
-5. **Low drift** — Commands, hooks, and handoffs force consistency.
-6. **Real benchmarkability** — Token/cost/result reporting is part of the architecture.
-
-## Public Core, Private Overlays
-
-ZenKit's protocol layer is fully open source. Everything in this repo is MIT-licensed.
-
-For team-specific workflows:
-- Add private skills in a separate overlay directory
-- Add proprietary agent configurations
-- Add custom benchmark specs for your features
-- Keep the public core unchanged
+3. **Bounded autonomy** — Assumptions explicit. Uncertainty recorded. Claims bounded.
+4. **Validation over narration** — Tests, schemas, and artifacts over prose.
+5. **Low drift** — Commands and handoffs force consistency.
+6. **Benchmarkable** — Acceptance criteria, not file existence.
 
 ## Documentation
 
-- [Philosophy](docs/philosophy.md) — Why ZenKit exists and what it values.
-- [Architecture](docs/architecture.md) — System design and primitive categories.
-- [Command Model](docs/command-model.md) — How commands work and chain together.
-- [Agent Contract](docs/agent-contract.md) — Agent definitions and handoff discipline.
-- [Benchmarking](docs/benchmarking.md) — The benchmark system and certainty model.
+- [Philosophy](docs/philosophy.md) — Design principles.
+- [Architecture](docs/architecture.md) — Primitives and workflow composition.
+- [Command Model](docs/command-model.md) — The 8 commands and output contract.
+- [Agent Contract](docs/agent-contract.md) — Agent definitions and handoff chains.
+- [Benchmarking](docs/benchmarking.md) — The benchmark system.
+- [Self-Audit](docs/self-audit.md) — How ZenKit audits itself and the limits of self-verification.
 - [Roadmap](docs/roadmap.md) — Future directions.
 
 ## License
