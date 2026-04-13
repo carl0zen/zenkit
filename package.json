@@ -1,6 +1,6 @@
 {
   "name": "zenkit",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": false,
   "description": "Disciplined workflows for coding agents — a lightweight open-source protocol layer for AI-assisted software building.",
   "license": "MIT",
@@ -15,7 +15,9 @@
     "benchmark:report": "tsx benchmark/scripts/report.ts",
     "benchmark:compare": "tsx benchmark/scripts/compare.ts",
     "benchmark:baseline": "tsx benchmark/scripts/run.ts benchmark/feature-specs/schema-validator-baseline.json",
-    "validate:schemas": "tsx src/lib/validate-schemas.ts"
+    "benchmark:all": "tsx benchmark/scripts/run-all.ts",
+    "validate:schemas": "tsx src/lib/validate-schemas.ts",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "ajv": "^8.17.1",
@@ -25,10 +27,13 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.59.1",
     "@types/node": "^22.10.0",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "autoprefixer": "^10.4.20",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^14.2.35",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.16",
     "tsx": "^4.19.2",

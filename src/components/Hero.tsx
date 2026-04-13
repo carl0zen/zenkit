@@ -3,7 +3,7 @@ export function Hero() {
     <section className="relative pt-32 pb-20 md:pt-44 md:pb-32">
       <div className="mx-auto max-w-4xl px-6 text-center">
         <div className="inline-block mb-6 px-3 py-1 border border-zen-700 rounded-full text-xs font-mono text-zen-400 tracking-wide">
-          v0.2.0 — open source protocol layer
+          v0.3.0 — open source protocol layer
         </div>
         <h1 className="text-4xl md:text-6xl font-semibold text-zen-50 leading-tight tracking-tight">
           Disciplined workflows
