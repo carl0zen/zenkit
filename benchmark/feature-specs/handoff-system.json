@@ -1,0 +1,69 @@
+{
+  "feature_id": "hs-001",
+  "name": "Handoff Contract System",
+  "description": "The structured handoff system that enables agent-to-agent context transfer with schema validation.",
+  "mode": "zenkit",
+  "acceptance_criteria": [
+    {
+      "id": "hs-1",
+      "description": "Handoff schema defines required fields: context, assumptions, decision, deliverable, next_agent",
+      "verification": { "type": "file_contains", "path": "schemas/handoff.schema.json", "pattern": "\"required\"" }
+    },
+    {
+      "id": "hs-2",
+      "description": "Handoff schema enforces deliverable type enum",
+      "verification": { "type": "file_contains", "path": "schemas/handoff.schema.json", "pattern": "\"enum\"" }
+    },
+    {
+      "id": "hs-3",
+      "description": "Handoff schema disallows additional properties",
+      "verification": { "type": "file_contains", "path": "schemas/handoff.schema.json", "pattern": "additionalProperties" }
+    },
+    {
+      "id": "hs-4",
+      "description": "Validation engine can validate handoff data",
+      "verification": { "type": "file_contains", "path": "src/lib/schemas.ts", "pattern": "handoff:" }
+    },
+    {
+      "id": "hs-5",
+      "description": "Example handoff data exists in playground examples",
+      "verification": { "type": "file_contains", "path": "src/lib/playground-examples.ts", "pattern": "handoff:" }
+    },
+    {
+      "id": "hs-6",
+      "description": "Handoff fixture validates against schema",
+      "verification": { "type": "examples_valid" }
+    },
+    {
+      "id": "hs-7",
+      "description": "Handoff command documentation exists",
+      "verification": { "type": "file_exists", "path": "commands/handoff.md" }
+    },
+    {
+      "id": "hs-8",
+      "description": "Agent contract docs explain handoff chain",
+      "verification": { "type": "file_contains", "path": "docs/agent-contract.md", "pattern": "handoff chain" }
+    },
+    {
+      "id": "hs-9",
+      "description": "Landing page shows handoff example",
+      "verification": { "type": "file_contains", "path": "src/components/HandoffExample.tsx", "pattern": "next_agent" }
+    }
+  ],
+  "constraints": [
+    "Handoff validation must be client-side compatible",
+    "Schema must be strict (additionalProperties: false)"
+  ],
+  "expected_files": [
+    "schemas/handoff.schema.json",
+    "src/lib/schemas.ts",
+    "commands/handoff.md",
+    "benchmark/fixtures/valid-handoff.json"
+  ],
+  "assigned_commands": ["spec", "build", "audit"],
+  "estimated_complexity": "low",
+  "limitations": [
+    "Verifies schema structure and content presence, not runtime handoff behavior",
+    "Does not test actual agent-to-agent transfers (requires multi-agent execution)"
+  ]
+}

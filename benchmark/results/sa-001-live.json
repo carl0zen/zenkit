@@ -1,0 +1,162 @@
+{
+  "benchmark_id": "bench-sa-001-1776059643390",
+  "version": "0.2.0",
+  "mode": "zenkit",
+  "task_name": "ZenKit Self-Audit",
+  "feature_spec": "benchmark/feature-specs/self-audit.json",
+  "started_at": "2026-04-13T05:54:03.317Z",
+  "completed_at": "2026-04-13T05:54:03.390Z",
+  "duration_ms": 73,
+  "status": "pass",
+  "expected_files": [
+    "docs/self-audit.md",
+    "schemas/benchmark.schema.json",
+    "src/components/SelfAudit.tsx",
+    "benchmark/scripts/run.ts"
+  ],
+  "files_found": [
+    "docs/self-audit.md",
+    "schemas/benchmark.schema.json",
+    "src/components/SelfAudit.tsx",
+    "benchmark/scripts/run.ts"
+  ],
+  "files_missing": [],
+  "acceptance_criteria_results": [
+    {
+      "id": "sa-1",
+      "description": "All 5 JSON schemas compile without errors",
+      "status": "pass",
+      "evidence": "5 schemas found (expected 5), 0 compilation errors",
+      "verification_type": "schema_count"
+    },
+    {
+      "id": "sa-2",
+      "description": "All schemas use consistent JSON Schema draft",
+      "status": "pass",
+      "evidence": "All 5 schemas use http://json-schema.org/draft-07/schema#",
+      "verification_type": "schemas_consistent"
+    },
+    {
+      "id": "sa-3",
+      "description": "Benchmark fixtures validate against their schemas",
+      "status": "pass",
+      "evidence": "valid-handoff.json: valid against handoff.schema.json; schemas.ts registers 'handoff'; schemas.ts registers 'task'; schemas.ts registers 'audit'; schemas.ts registers 'checkpoint'; schemas.ts registers 'benchmark'",
+      "verification_type": "examples_valid"
+    },
+    {
+      "id": "sa-4",
+      "description": "Self-audit documentation exists",
+      "status": "pass",
+      "evidence": "docs/self-audit.md exists",
+      "verification_type": "file_exists"
+    },
+    {
+      "id": "sa-5",
+      "description": "Self-audit doc addresses circular validation safeguards",
+      "status": "pass",
+      "evidence": "docs/self-audit.md contains 'circular'",
+      "verification_type": "file_contains"
+    },
+    {
+      "id": "sa-6",
+      "description": "README links to self-audit documentation",
+      "status": "pass",
+      "evidence": "README.md contains 'self-audit'",
+      "verification_type": "file_contains"
+    },
+    {
+      "id": "sa-7",
+      "description": "Landing page includes self-audit section",
+      "status": "pass",
+      "evidence": "src/components/SelfAudit.tsx contains 'self-certification'",
+      "verification_type": "file_contains"
+    },
+    {
+      "id": "sa-8",
+      "description": "Benchmark results include uncertainty notes",
+      "status": "pass",
+      "evidence": "schemas/benchmark.schema.json contains 'uncertainty'",
+      "verification_type": "file_contains"
+    }
+  ],
+  "stages": [
+    {
+      "name": "spec",
+      "status": "pass",
+      "duration_ms": 0,
+      "checks_run": 3,
+      "checks_passed": 3,
+      "details": [
+        "name present",
+        "8 acceptance criteria defined",
+        "3 limitations declared"
+      ]
+    },
+    {
+      "name": "schemas",
+      "status": "pass",
+      "duration_ms": 45,
+      "checks_run": 6,
+      "checks_passed": 6,
+      "details": [
+        "5 schemas compiled, 0 errors",
+        "All 5 schemas use http://json-schema.org/draft-07/schema#"
+      ]
+    },
+    {
+      "name": "build",
+      "status": "pass",
+      "duration_ms": 0,
+      "checks_run": 4,
+      "checks_passed": 4,
+      "details": [
+        "docs/self-audit.md exists",
+        "schemas/benchmark.schema.json exists",
+        "src/components/SelfAudit.tsx exists",
+        "benchmark/scripts/run.ts exists"
+      ]
+    },
+    {
+      "name": "audit",
+      "status": "pass",
+      "duration_ms": 0,
+      "checks_run": 8,
+      "checks_passed": 8,
+      "details": [
+        "[PASS] sa-1: 5 schemas found (expected 5), 0 compilation errors",
+        "[PASS] sa-2: All 5 schemas use http://json-schema.org/draft-07/schema#",
+        "[PASS] sa-3: valid-handoff.json: valid against handoff.schema.json; schemas.ts registers 'handoff'; schemas.ts registers 'task'; schemas.ts registers 'audit'; schemas.ts registers 'checkpoint'; schemas.ts registers 'benchmark'",
+        "[PASS] sa-4: docs/self-audit.md exists",
+        "[PASS] sa-5: docs/self-audit.md contains 'circular'",
+        "[PASS] sa-6: README.md contains 'self-audit'",
+        "[PASS] sa-7: src/components/SelfAudit.tsx contains 'self-certification'",
+        "[PASS] sa-8: schemas/benchmark.schema.json contains 'uncertainty'"
+      ]
+    }
+  ],
+  "validation_summary": {
+    "total_criteria": 8,
+    "criteria_passed": 8,
+    "criteria_failed": 0,
+    "schemas_valid": true,
+    "examples_valid": false
+  },
+  "telemetry": {
+    "estimated": {
+      "tokens": 25000,
+      "cost_usd": 0.195,
+      "basis": "Heuristic: 5000 base + 2500 per criterion, scaled by complexity"
+    },
+    "actual": null
+  },
+  "uncertainty": [
+    "Token and cost figures are estimates — no actual API telemetry is captured by this runner",
+    "Acceptance criteria verify code structure and schema validity, not runtime UI behavior",
+    "Stage durations reflect verification time, not original implementation time"
+  ],
+  "limitations": [
+    "Self-audit checks structure and content presence, not semantic correctness",
+    "Cannot verify whether safeguards are actually followed in practice",
+    "A system auditing itself has inherent blind spots — this is documented, not eliminated"
+  ]
+}

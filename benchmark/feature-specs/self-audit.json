@@ -1,0 +1,65 @@
+{
+  "feature_id": "sa-001",
+  "name": "ZenKit Self-Audit",
+  "description": "ZenKit auditing its own repository structure, schema validity, test coverage, and documentation completeness.",
+  "mode": "zenkit",
+  "acceptance_criteria": [
+    {
+      "id": "sa-1",
+      "description": "All 5 JSON schemas compile without errors",
+      "verification": { "type": "schema_count", "expected": 5 }
+    },
+    {
+      "id": "sa-2",
+      "description": "All schemas use consistent JSON Schema draft",
+      "verification": { "type": "schemas_consistent" }
+    },
+    {
+      "id": "sa-3",
+      "description": "Benchmark fixtures validate against their schemas",
+      "verification": { "type": "examples_valid" }
+    },
+    {
+      "id": "sa-4",
+      "description": "Self-audit documentation exists",
+      "verification": { "type": "file_exists", "path": "docs/self-audit.md" }
+    },
+    {
+      "id": "sa-5",
+      "description": "Self-audit doc addresses circular validation safeguards",
+      "verification": { "type": "file_contains", "path": "docs/self-audit.md", "pattern": "circular" }
+    },
+    {
+      "id": "sa-6",
+      "description": "README links to self-audit documentation",
+      "verification": { "type": "file_contains", "path": "README.md", "pattern": "self-audit" }
+    },
+    {
+      "id": "sa-7",
+      "description": "Landing page includes self-audit section",
+      "verification": { "type": "file_contains", "path": "src/components/SelfAudit.tsx", "pattern": "self-certification" }
+    },
+    {
+      "id": "sa-8",
+      "description": "Benchmark results include uncertainty notes",
+      "verification": { "type": "file_contains", "path": "schemas/benchmark.schema.json", "pattern": "uncertainty" }
+    }
+  ],
+  "constraints": [
+    "Must use ZenKit's own benchmark runner for verification",
+    "Must not claim self-audit proves correctness"
+  ],
+  "expected_files": [
+    "docs/self-audit.md",
+    "schemas/benchmark.schema.json",
+    "src/components/SelfAudit.tsx",
+    "benchmark/scripts/run.ts"
+  ],
+  "assigned_commands": ["audit", "checkpoint"],
+  "estimated_complexity": "low",
+  "limitations": [
+    "Self-audit checks structure and content presence, not semantic correctness",
+    "Cannot verify whether safeguards are actually followed in practice",
+    "A system auditing itself has inherent blind spots — this is documented, not eliminated"
+  ]
+}

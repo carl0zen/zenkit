@@ -1,0 +1,85 @@
+{
+  "feature_id": "pc-001",
+  "name": "Protocol Completeness",
+  "description": "Verifies the complete ZenKit protocol layer exists: all commands, schemas, skills, hooks, agents, rubrics, templates, and documentation.",
+  "mode": "zenkit",
+  "acceptance_criteria": [
+    {
+      "id": "pc-1",
+      "description": "All 8 commands exist",
+      "verification": { "type": "file_exists", "path": "commands/ship.md" }
+    },
+    {
+      "id": "pc-2",
+      "description": "All 5 schemas compile",
+      "verification": { "type": "schema_count", "expected": 5 }
+    },
+    {
+      "id": "pc-3",
+      "description": "Architecture documentation exists",
+      "verification": { "type": "file_exists", "path": "docs/architecture.md" }
+    },
+    {
+      "id": "pc-4",
+      "description": "Philosophy documentation exists",
+      "verification": { "type": "file_exists", "path": "docs/philosophy.md" }
+    },
+    {
+      "id": "pc-5",
+      "description": "Benchmark system documentation exists",
+      "verification": { "type": "file_exists", "path": "docs/benchmarking.md" }
+    },
+    {
+      "id": "pc-6",
+      "description": "Pre-change hook exists",
+      "verification": { "type": "file_exists", "path": "hooks/pre-change.md" }
+    },
+    {
+      "id": "pc-7",
+      "description": "At least one rubric defines a scoring scale",
+      "verification": { "type": "file_contains", "path": "rubrics/execution-quality.md", "pattern": "Score" }
+    },
+    {
+      "id": "pc-8",
+      "description": "Agent template exists for extending the protocol",
+      "verification": { "type": "file_exists", "path": "templates/agent.template.md" }
+    },
+    {
+      "id": "pc-9",
+      "description": "README documents the project structure",
+      "verification": { "type": "file_contains", "path": "README.md", "pattern": "commands/" }
+    },
+    {
+      "id": "pc-10",
+      "description": "Schemas use consistent draft version",
+      "verification": { "type": "schemas_consistent" }
+    }
+  ],
+  "constraints": [
+    "Protocol artifacts are plain files (markdown + JSON), no compiled dependencies"
+  ],
+  "expected_files": [
+    "commands/spec.md",
+    "commands/plan.md",
+    "commands/build.md",
+    "commands/audit.md",
+    "commands/refactor.md",
+    "commands/handoff.md",
+    "commands/checkpoint.md",
+    "commands/ship.md",
+    "schemas/handoff.schema.json",
+    "schemas/task.schema.json",
+    "schemas/audit.schema.json",
+    "schemas/checkpoint.schema.json",
+    "schemas/benchmark.schema.json",
+    "docs/architecture.md",
+    "docs/philosophy.md",
+    "docs/benchmarking.md"
+  ],
+  "assigned_commands": ["audit"],
+  "estimated_complexity": "low",
+  "limitations": [
+    "Verifies file existence and key content, not comprehensive content quality",
+    "Does not evaluate whether individual commands or agents are well-written"
+  ]
+}
