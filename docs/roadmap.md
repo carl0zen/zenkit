@@ -1,31 +1,33 @@
-# ZenKit Roadmap
+# Roadmap
 
-This roadmap describes concrete next steps for ZenKit. Items are listed roughly in priority order. No timelines are promised -- this is an open-source project and progress depends on contributions.
+## Done in v0.2
 
-## Real Telemetry Adapters
+- Acceptance-criteria-driven benchmark runner (23 checks, 8 criteria)
+- Baseline vs zenkit comparison architecture (illustrative data)
+- Self-audit documentation with circular-validation safeguards
+- 72% reduction in protocol artifact size
+- Telemetry honesty: estimated/actual separation with basis field
+- Uncertainty and limitations as first-class result fields
 
-Currently, token counts and cost estimates are inferred from output size. The next step is provider-specific adapters that capture actual token usage, latency breakdowns, and cost from API responses. Initial targets: OpenAI, Anthropic, and local model servers that expose usage metadata.
+## Next priorities
 
-## CI Integration
+### Browser-based acceptance criteria
+Add Playwright or Cypress tests as a verification type so the benchmark can check UI behavior, not just code structure.
 
-ZenKit workflows should run in CI pipelines. This means a CLI mode that exits with proper codes, structured output to stdout, and integration examples for GitHub Actions, GitLab CI, and generic shell-based runners. The benchmark system should produce JUnit-compatible reports for CI dashboards.
+### Real telemetry adapters
+Provider-specific adapters that capture actual token usage and cost from API responses. Initial targets: Anthropic, OpenAI.
 
-## Custom Schema Extensions
+### CI integration
+CLI mode with proper exit codes, JUnit-compatible report output, and GitHub Actions example workflow.
 
-Teams need to extend the standard output shape with domain-specific fields without breaking compatibility. Schema extension support will allow adding custom fields to command outputs while preserving the base contract. Extensions must be declared and versioned.
+### A/B workflow comparison
+Execute the same feature spec twice — once with ZenKit structure, once without — and measure drift, retries, and rework. This is the prerequisite for meaningful (non-illustrative) comparison data.
 
-## Workflow Visualization
+### Custom schema extensions
+Allow teams to extend the standard output contract with domain-specific fields without breaking compatibility.
 
-A command that reads checkpoint and handoff artifacts and produces a visual map of the workflow: which agents ran, what they produced, where failures occurred, and how long each step took. Output targets: terminal-friendly text, SVG, and Mermaid diagram syntax.
+### Workflow visualization
+Read checkpoint and handoff artifacts, produce a visual map of agent execution. Output targets: terminal text, Mermaid diagram syntax.
 
-## Community Skills Registry
-
-A registry where teams can publish and discover reusable skills. Skills must include schema definitions, test cases, and usage examples. The registry is a package index, not a marketplace -- no accounts, no payments, just versioned skill packages.
-
-## Multi-Repo Support
-
-Workflows that span multiple repositories. A plan in repo A triggers builds in repos B and C, with handoff artifacts coordinated across repo boundaries. This requires a lightweight coordination layer on top of the existing file-based protocol.
-
-## IDE Plugins
-
-Editor integrations that surface ZenKit workflow state, checkpoint status, and audit findings inline. Initial targets: VS Code and JetBrains IDEs. Plugins should be thin wrappers around the CLI, not reimplementations.
+### Community skills registry
+Versioned skill packages with schema definitions and test cases. A package index, not a marketplace.
