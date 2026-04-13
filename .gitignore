@@ -31,3 +31,7 @@ next-env.d.ts
 
 # vitest
 coverage/
+
+# playwright
+test-results/
+playwright-report/
