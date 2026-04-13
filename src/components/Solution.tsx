@@ -20,27 +20,26 @@ export function Solution() {
           </div>
 
           <div className="code-block text-zen-300">
-            <div className="text-zen-500 text-xs mb-3 font-mono">workflow.ts</div>
-            <pre className="text-sm leading-relaxed">{`// ZenKit workflow: spec → plan → build → audit → ship
-const feature = await zenkit.spec({
-  name: "user-profile-page",
-  acceptance: ["renders profile data", "handles loading state"],
-});
+            <div className="text-zen-500 text-xs mb-3 font-mono">terminal</div>
+            <pre className="text-sm leading-relaxed">{`# Validate a handoff artifact against the schema
+$ zenkit validate handoff build-output.json
+PASS — build-output.json validates against handoff.schema.json
 
-const plan = await zenkit.plan({ spec: feature });
-const build = await zenkit.build({ plan });
-const audit = await zenkit.audit({ build });
+# Run all benchmark specs (4 specs, 35 criteria, 101 checks)
+$ zenkit benchmark:all
+  [PASS] Handoff Contract System — 9/9 criteria
+  [PASS] Protocol Completeness — 10/10 criteria
+  [PASS] Schema Validator Playground — 8/8 criteria
+  [PASS] ZenKit Self-Audit — 8/8 criteria
+  4/4 passed
 
-// Checkpoint: explicit gate before shipping
-await zenkit.checkpoint({
-  stage: "pre-ship",
-  gates: [
-    { condition: "tests pass", met: audit.tests_passing },
-    { condition: "no critical findings", met: audit.critical === 0 },
-  ],
-});
-
-await zenkit.ship({ audit });`}</pre>
+# Check project health
+$ zenkit status
+  OK  commands/ (8 files)
+  OK  schemas/ (5 files)
+  OK  5 JSON schemas
+  OK  CI workflow
+  Last benchmark: 4/4 specs passed`}</pre>
           </div>
         </div>
       </div>
