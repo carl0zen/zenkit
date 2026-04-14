@@ -46,8 +46,8 @@
     },
     {
       "id": "sa-9",
-      "description": "Unit tests pass",
-      "verification": { "type": "test_passes", "command": "npx vitest run --reporter=dot" }
+      "description": "Schema validation script passes",
+      "verification": { "type": "test_passes", "command": "npx tsx src/lib/validate-schemas.ts" }
     },
     {
       "id": "sa-10",

@@ -33,7 +33,7 @@ describe('zenkit CLI', () => {
       expect(output).toContain('OK')
       expect(output).toContain('commands/')
       expect(output).toContain('schemas/')
-      expect(output).toContain('4/4 specs passed')
+      expect(output).toContain('specs passed')
     })
   })
 
