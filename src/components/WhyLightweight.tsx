@@ -1,24 +1,24 @@
 export function WhyLightweight() {
   const comparisons = [
     {
-      heavy: 'Orchestration runtime with daemon processes',
-      zen: 'Plain files. No daemon. No runtime dependency.',
+      instead: 'Orchestration runtime with daemon processes',
+      zenkit: 'Plain files. No daemon. No runtime dependency.',
     },
     {
-      heavy: 'Agent personas with elaborate backstories',
-      zen: 'Agent contracts with bounded responsibility and explicit handoffs.',
+      instead: 'Agent personas with elaborate backstories',
+      zenkit: 'Agent contracts with bounded responsibility and explicit handoffs.',
     },
     {
-      heavy: 'Custom DSL for workflow definition',
-      zen: 'Markdown commands + JSON Schema. Tools you already know.',
+      instead: 'Custom DSL for workflow definition',
+      zenkit: 'Markdown commands + JSON Schema. Tools you already know.',
     },
     {
-      heavy: 'Vendor-locked tool integrations',
-      zen: 'Runtime-agnostic. Works with Claude Code, local runtimes, or custom harnesses.',
+      instead: 'Vendor-locked tool integrations',
+      zenkit: 'Runtime-agnostic. Works with Claude Code, local runtimes, or custom harnesses.',
     },
     {
-      heavy: 'Dashboard-first management layer',
-      zen: 'CLI-first. Files in your repo. Version-controlled with your code.',
+      instead: 'Dashboard-first management layer',
+      zenkit: 'CLI-first. Files in your repo. Version-controlled with your code.',
     },
   ]
 
@@ -36,17 +36,18 @@ export function WhyLightweight() {
           </p>
         </div>
 
-        <div className="mt-12 space-y-4">
+        <div className="mt-12 space-y-3">
           {comparisons.map((c, i) => (
             <div
               key={i}
-              className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 p-4 rounded-lg"
+              className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-8 p-4 rounded-lg bg-zen-900/10"
             >
-              <div className="text-sm text-zen-500 line-through decoration-zen-700">
-                {c.heavy}
+              <div className="text-sm text-zen-500">
+                <span className="font-mono text-xs text-zen-600 mr-2">instead of</span>
+                {c.instead}
               </div>
               <div className="text-sm text-zen-300">
-                {c.zen}
+                {c.zenkit}
               </div>
             </div>
           ))}

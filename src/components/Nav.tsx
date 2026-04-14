@@ -5,9 +5,9 @@ export function Nav() {
         <a href="/" className="font-mono text-sm font-medium text-zen-300 tracking-wider">
           zenkit
         </a>
-        <div className="flex items-center gap-6 text-sm text-zen-400">
-          <a href="#primitives" className="hover:text-zen-200 transition-colors">Primitives</a>
-          <a href="#benchmark" className="hover:text-zen-200 transition-colors">Benchmark</a>
+        <div className="flex items-center gap-4 md:gap-6 text-sm text-zen-400">
+          <a href="#primitives" className="hidden sm:inline hover:text-zen-200 transition-colors">Primitives</a>
+          <a href="#benchmark" className="hidden sm:inline hover:text-zen-200 transition-colors">Benchmark</a>
           <a href="/playground" className="hover:text-zen-200 transition-colors">Playground</a>
           <a
             href="https://github.com/carl0zen/zenkit"
@@ -15,7 +15,7 @@ export function Nav() {
             rel="noopener noreferrer"
             className="text-zen-300 hover:text-zen-100 transition-colors font-mono"
           >
-            GitHub →
+            GitHub
           </a>
         </div>
       </div>
