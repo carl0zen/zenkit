@@ -36,10 +36,13 @@
             "properties": {
               "type": {
                 "type": "string",
-                "enum": ["file_exists", "file_contains", "schema_count", "examples_valid", "schemas_consistent"]
+                "enum": ["file_exists", "file_contains", "schema_count", "examples_valid", "schemas_consistent", "test_passes", "json_path_equals"]
               },
               "path": { "type": "string" },
               "pattern": { "type": "string" },
+              "command": { "type": "string", "description": "Shell command to run for test_passes verification." },
+              "json_path": { "type": "string", "description": "Dot-separated path into JSON for json_path_equals." },
+              "equals": { "description": "Expected value for json_path_equals." },
               "expected": { "type": "integer" }
             }
           }

@@ -15,10 +15,13 @@ import addFormats from 'ajv-formats'
 // --- Types ---
 
 interface Verification {
-  type: 'file_exists' | 'file_contains' | 'schema_count' | 'examples_valid' | 'schemas_consistent'
+  type: 'file_exists' | 'file_contains' | 'schema_count' | 'examples_valid' | 'schemas_consistent' | 'test_passes' | 'json_path_equals'
   path?: string
   pattern?: string
   expected?: number
+  command?: string
+  json_path?: string
+  equals?: unknown
 }
 
 interface AcceptanceCriterion {
@@ -264,6 +267,72 @@ function verifyCriterion(criterion: AcceptanceCriterion): CriterionResult {
         status: result.consistent ? 'pass' : 'fail',
         evidence: result.details,
         verification_type: 'schemas_consistent',
+      }
+    }
+
+    case 'test_passes': {
+      const cmd = verification.command || 'npm test'
+      try {
+        const { execSync } = require('child_process')
+        execSync(cmd, { cwd: ROOT, encoding: 'utf-8', timeout: 60000, stdio: 'pipe' })
+        return {
+          id: criterion.id,
+          description: criterion.description,
+          status: 'pass',
+          evidence: `Command '${cmd}' exited with code 0`,
+          verification_type: 'test_passes',
+        }
+      } catch (err: any) {
+        return {
+          id: criterion.id,
+          description: criterion.description,
+          status: 'fail',
+          evidence: `Command '${cmd}' failed with exit code ${err.status || 'unknown'}`,
+          verification_type: 'test_passes',
+        }
+      }
+    }
+
+    case 'json_path_equals': {
+      const filePath = verification.path!
+      const jsonPath = verification.json_path!
+      const expectedValue = verification.equals
+      if (!fileExists(filePath)) {
+        return {
+          id: criterion.id,
+          description: criterion.description,
+          status: 'fail',
+          evidence: `File not found: ${filePath}`,
+          verification_type: 'json_path_equals',
+        }
+      }
+      try {
+        const data = JSON.parse(fs.readFileSync(resolve(filePath), 'utf-8'))
+        // Simple dot-path traversal
+        const parts = jsonPath.split('.')
+        let current: any = data
+        for (const part of parts) {
+          if (current === undefined || current === null) break
+          current = current[part]
+        }
+        const match = JSON.stringify(current) === JSON.stringify(expectedValue)
+        return {
+          id: criterion.id,
+          description: criterion.description,
+          status: match ? 'pass' : 'fail',
+          evidence: match
+            ? `${filePath}:${jsonPath} equals ${JSON.stringify(expectedValue)}`
+            : `${filePath}:${jsonPath} is ${JSON.stringify(current)}, expected ${JSON.stringify(expectedValue)}`,
+          verification_type: 'json_path_equals',
+        }
+      } catch (err) {
+        return {
+          id: criterion.id,
+          description: criterion.description,
+          status: 'fail',
+          evidence: `Error reading ${filePath}: ${err}`,
+          verification_type: 'json_path_equals',
+        }
       }
     }
 

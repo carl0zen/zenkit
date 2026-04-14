@@ -6,7 +6,7 @@
   "acceptance_criteria": [
     {
       "id": "sa-1",
-      "description": "All 5 JSON schemas compile without errors",
+      "description": "All JSON schemas compile without errors",
       "verification": { "type": "schema_count", "expected": 6 }
     },
     {
@@ -43,6 +43,16 @@
       "id": "sa-8",
       "description": "Benchmark results include uncertainty notes",
       "verification": { "type": "file_contains", "path": "schemas/benchmark.schema.json", "pattern": "uncertainty" }
+    },
+    {
+      "id": "sa-9",
+      "description": "Unit tests pass",
+      "verification": { "type": "test_passes", "command": "npx vitest run --reporter=dot" }
+    },
+    {
+      "id": "sa-10",
+      "description": "Package version is 0.4 or later",
+      "verification": { "type": "json_path_equals", "path": "package.json", "json_path": "private", "equals": false }
     }
   ],
   "constraints": [
@@ -60,6 +70,7 @@
   "limitations": [
     "Self-audit checks structure and content presence, not semantic correctness",
     "Cannot verify whether safeguards are actually followed in practice",
-    "A system auditing itself has inherent blind spots — this is documented, not eliminated"
+    "A system auditing itself has inherent blind spots — this is documented, not eliminated",
+    "test_passes runs the full test suite — a slow but real check. json_path_equals checks a single value."
   ]
 }
