@@ -45,18 +45,18 @@ npm install
 # CLI
 npm run zenkit status           # Project health check
 npm run zenkit validate handoff data.json  # Validate against schema
-npm run zenkit benchmark:all    # Run all 4 benchmark specs
+npm run zenkit benchmark:all    # Run all 5 benchmark specs
 
 # Development
 npm run dev              # Landing page at localhost:3000, playground at /playground
-npm test                 # 32 unit tests
-npm run test:e2e         # 12 Playwright E2E browser tests
+npm test                 # 42 unit tests
+npm run test:e2e         # 13 Playwright E2E browser tests
 npm run lint             # ESLint
 npm run build            # Production build
 
 # Benchmarking
 npm run benchmark        # Single spec (schema validator playground)
-npm run benchmark:all    # All 4 specs (101 checks, 35 criteria)
+npm run benchmark:all    # All 5 specs (131 checks, 44 criteria)
 npm run benchmark:report # Markdown report from latest result
 npm run benchmark:compare # ZenKit vs baseline comparison
 npm run benchmark:visualize -- --summary  # Mermaid workflow diagram
@@ -78,14 +78,15 @@ ZenKit benchmarks verify acceptance criteria against the actual implementation â
 
 ### Current coverage
 
-4 feature specs with 35 acceptance criteria and 101 total checks:
+5 feature specs with 44 acceptance criteria and 131 total checks:
 
 | Spec | Criteria | Checks |
 |------|----------|--------|
-| Schema Validator Playground | 8 | 23 |
-| Handoff Contract System | 9 | 22 |
-| Protocol Completeness | 10 | 35 |
-| Self-Audit | 8 | 21 |
+| Schema Validator Playground | 8 | 25 |
+| Handoff Contract System | 9 | 24 |
+| Protocol Completeness | 10 | 37 |
+| Self-Audit | 10 | 25 |
+| CLI Tool | 7 | 20 |
 
 ### Verification types
 
@@ -129,6 +130,7 @@ npm run zenkit validate <schema> <file>     # Validate JSON
 npm run zenkit validate:all                 # Check all schemas compile
 npm run zenkit benchmark [spec]             # Run single benchmark
 npm run zenkit benchmark:all                # Run all benchmarks
+npm run zenkit audit                        # Run all benchmarks + produce audit report
 npm run zenkit init [dir]                   # Scaffold ZenKit into a project
 ```
 
@@ -136,9 +138,9 @@ npm run zenkit init [dir]                   # Scaffold ZenKit into a project
 
 | Layer | Tests | What it covers |
 |-------|-------|----------------|
-| Unit (Vitest) | 32 | Schema validation, example data, edge cases, benchmark result structure |
-| E2E (Playwright) | 12 | Playground UI, schema selection, validation flows, landing page |
-| Benchmarks | 101 checks | Code structure, schema compilation, documentation, self-audit |
+| Unit (Vitest) | 42 | Schema validation, example data, edge cases, benchmark results, CLI commands, handoff validation, feature spec validation |
+| E2E (Playwright) | 13 | Playground UI, schema selection, validation flows, format button, landing page sections, navigation |
+| Benchmarks | 131 checks | Code structure, schema compilation, test execution, JSON values, documentation, self-audit, CLI |
 
 ## Extending
 
