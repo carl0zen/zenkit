@@ -8,7 +8,7 @@
 
 Add structured specs, plans, audits, checkpoints, and handoffs to any project. Native slash commands and skills. No daemon, no framework, no lock-in.
 
-**[Landing Page](https://carl0zen.github.io/zenkit)** | **[Playground](https://carl0zen.github.io/zenkit/playground)** | **[npm](https://www.npmjs.com/package/zenkit)**
+**[Landing Page](https://zenkit.systems)** | **[Playground](https://zenkit.systems/playground)** | **[npm](https://www.npmjs.com/package/zenkit)**
 
 ## Quick start
 

@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://zenkit.dev/schemas/handoff.schema.json",
+  "$id": "https://zenkit.systems/schemas/handoff.schema.json",
   "title": "ZenKit Handoff Contract",
   "description": "Structured handoff between agents or workflow stages in ZenKit.",
   "type": "object",

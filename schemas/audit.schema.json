@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://zenkit.dev/schemas/audit.schema.json",
+  "$id": "https://zenkit.systems/schemas/audit.schema.json",
   "title": "ZenKit Audit Report",
   "description": "Structured audit output from a ZenKit audit command.",
   "type": "object",

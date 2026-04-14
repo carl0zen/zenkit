@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://zenkit.dev/schemas/task.schema.json",
+  "$id": "https://zenkit.systems/schemas/task.schema.json",
   "title": "ZenKit Task",
   "description": "A discrete unit of work within a ZenKit workflow.",
   "type": "object",

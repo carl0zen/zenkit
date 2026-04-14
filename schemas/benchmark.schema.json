@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://zenkit.dev/schemas/benchmark.schema.json",
+  "$id": "https://zenkit.systems/schemas/benchmark.schema.json",
   "title": "ZenKit Benchmark Result",
   "description": "Structured output from a ZenKit benchmark run with acceptance criteria verification.",
   "type": "object",

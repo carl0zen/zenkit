@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://zenkit.dev/schemas/checkpoint.schema.json",
+  "$id": "https://zenkit.systems/schemas/checkpoint.schema.json",
   "title": "ZenKit Checkpoint",
   "description": "A snapshot of workflow state at a specific point in execution.",
   "type": "object",
