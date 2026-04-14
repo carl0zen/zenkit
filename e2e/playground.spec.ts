@@ -61,6 +61,17 @@ test.describe('Schema Validator Playground', () => {
     await expect(page.locator('.text-green-400')).toContainText('Valid')
   })
 
+  test('format button formats JSON', async ({ page }) => {
+    const editor = page.locator('textarea[aria-label="JSON data input"]')
+    // Paste compact JSON
+    await editor.fill('{"context":"test","assumptions":[],"decision":"yes","deliverable":{"type":"code","description":"x"},"next_agent":"qa"}')
+    await page.click('button:has-text("format")')
+    const formatted = await editor.inputValue()
+    // Formatted JSON should have newlines and indentation
+    expect(formatted).toContain('\\n')
+    expect(formatted.split('\\n').length).toBeGreaterThan(3)
+  })
+
   test('schema viewer toggles', async ({ page }) => {
     const toggle = page.locator('button:has-text("Schema Definition")')
     await toggle.click()
