@@ -1,4 +1,4 @@
-import benchmarkResult from '../../benchmark/results/svp-001-live.json'
+import benchmarkResult from '../../benchmark/results/svp-001-snapshot.json'
 
 export function BenchmarkSection() {
   const r = benchmarkResult

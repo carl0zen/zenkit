@@ -51,7 +51,7 @@ When producing structured output for ZenKit workflows, use this shape:
 - Example data is in `src/lib/playground-examples.ts` — must match current schema shapes
 - Benchmark specs are in `benchmark/feature-specs/` — run after changes with `npm run zenkit benchmark:all`
 - Landing page components are in `src/components/` — build with `npm run build` to verify
-- The BenchmarkSection imports live results from `benchmark/results/svp-001-live.json` — regenerate with `npm run benchmark`
+- Landing page imports committed snapshots from `benchmark/results/*-snapshot.json` — regenerate live results with `npm run benchmark:all`, then copy to snapshots if updating the landing page
 
 ## Design principles to follow
 

@@ -1,4 +1,4 @@
-import summary from '../../benchmark/results/summary.json'
+import summary from '../../benchmark/results/summary-snapshot.json'
 
 export function BenchmarkSummary() {
   return (

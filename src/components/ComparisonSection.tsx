@@ -1,4 +1,4 @@
-import comparison from '../../benchmark/results/comparison-svp-001.json'
+import comparison from '../../benchmark/results/comparison-snapshot.json'
 
 export function ComparisonSection() {
   const c = comparison

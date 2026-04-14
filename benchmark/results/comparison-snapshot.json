@@ -1,0 +1,69 @@
+{
+  "comparison_id": "cmp-1776124664052",
+  "version": "0.2.0",
+  "zenkit_result": "benchmark/results/svp-001-live.json",
+  "baseline_result": "benchmark/results/svp-001-baseline-live.json",
+  "generated_at": "2026-04-13T23:57:44.052Z",
+  "data_source": "illustrative",
+  "summary": {
+    "zenkit_status": "pass",
+    "baseline_status": "pass",
+    "zenkit_criteria_passed": 8,
+    "baseline_criteria_passed": 8,
+    "zenkit_total_checks": 25,
+    "baseline_total_checks": 25,
+    "zenkit_duration_ms": 101,
+    "baseline_duration_ms": 99
+  },
+  "structural_differences": [
+    {
+      "category": "Workflow structure",
+      "zenkit": "4 stages with 25 checks",
+      "baseline": "4 stages with 25 checks",
+      "note": "ZenKit enforces staged validation; baseline runs the same checks without workflow metadata"
+    },
+    {
+      "category": "Uncertainty tracking",
+      "zenkit": "3 uncertainty notes, 2 limitations",
+      "baseline": "3 uncertainty notes, 3 limitations",
+      "note": "Both specs can declare uncertainty; ZenKit workflow structure makes this a first-class requirement"
+    },
+    {
+      "category": "Handoff contracts",
+      "zenkit": "Handoff schema enforced between stages",
+      "baseline": "No handoff contracts — context transfer is implicit",
+      "note": "This structural difference matters most in multi-agent workflows, not single-feature benchmarks"
+    },
+    {
+      "category": "Acceptance criteria format",
+      "zenkit": "Machine-verifiable criteria with verification steps",
+      "baseline": "Same criteria format (shared spec structure)",
+      "note": "The verification format is the same — the difference is that ZenKit mandates it"
+    }
+  ],
+  "telemetry_comparison": [
+    {
+      "metric": "Estimated tokens",
+      "zenkit": "~37,500",
+      "baseline": "~37,500",
+      "source": "estimated"
+    },
+    {
+      "metric": "Estimated cost",
+      "zenkit": "~$0.29",
+      "baseline": "~$0.29",
+      "source": "estimated"
+    }
+  ],
+  "interpretation": [
+    "In this comparison, both modes verify the same codebase and produce the same pass/fail results.",
+    "The structural difference is in workflow metadata: ZenKit runs enforce staged validation, explicit uncertainty, and handoff contracts.",
+    "A meaningful cost/quality comparison requires running the actual implementation process twice — once with ZenKit structure, once without — and measuring drift, retries, and rework.",
+    "This comparison demonstrates the architecture for such measurement, not the measurement itself."
+  ],
+  "caveats": [
+    "This is illustrative data. Both benchmark runs validate the same already-built feature.",
+    "Pass/fail parity is expected — the value of ZenKit structure shows in multi-step, multi-agent workflows where drift compounds.",
+    "Real comparison data requires A/B workflow execution, which is outside the scope of this static benchmark."
+  ]
+}
