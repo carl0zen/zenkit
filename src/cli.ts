@@ -107,7 +107,101 @@ function status() {
   }
 }
 
+function findPackageTemplates(): string {
+  // Find the zenkit package's template directory
+  const candidates = [
+    path.join(__dirname, '..', 'templates', 'claude'), // compiled (dist/)
+    path.join(__dirname, '..', '..', 'templates', 'claude'), // development
+    path.join(ROOT, 'templates', 'claude'), // local repo
+    path.join(ROOT, 'node_modules', 'zenkit', 'templates', 'claude'), // npm installed
+  ]
+  for (const c of candidates) {
+    if (fs.existsSync(c)) return c
+  }
+  return ''
+}
+
+function copyDirRecursive(src: string, dest: string) {
+  if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true })
+  for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
+    const srcPath = path.join(src, entry.name)
+    const destPath = path.join(dest, entry.name)
+    if (entry.isDirectory()) {
+      copyDirRecursive(srcPath, destPath)
+    } else {
+      if (!fs.existsSync(destPath)) {
+        fs.copyFileSync(srcPath, destPath)
+        console.log(`  created ${path.relative(args[1] === 'claude' ? (args[2] || process.cwd()) : (args[1] || process.cwd()), destPath)}`)
+      } else {
+        console.log(`  exists  ${path.relative(args[1] === 'claude' ? (args[2] || process.cwd()) : (args[1] || process.cwd()), destPath)}`)
+      }
+    }
+  }
+}
+
+function initClaude() {
+  const targetDir = args[2] ? path.resolve(args[2]) : process.cwd()
+  const templateDir = findPackageTemplates()
+
+  console.log('ZenKit for Claude Code')
+  console.log('======================\n')
+
+  if (!templateDir) {
+    console.error('Could not find Claude Code templates. Make sure zenkit is installed.')
+    process.exit(1)
+  }
+
+  // Copy .claude directory
+  const claudeSrc = path.join(templateDir, '.claude')
+  const claudeDest = path.join(targetDir, '.claude')
+  if (fs.existsSync(claudeSrc)) {
+    copyDirRecursive(claudeSrc, claudeDest)
+  }
+
+  // Generate CLAUDE.md (append if exists, create if not)
+  const claudeMdSrc = path.join(templateDir, 'CLAUDE.md')
+  const claudeMdDest = path.join(targetDir, 'CLAUDE.md')
+  if (fs.existsSync(claudeMdSrc)) {
+    const content = fs.readFileSync(claudeMdSrc, 'utf-8')
+    if (fs.existsSync(claudeMdDest)) {
+      const existing = fs.readFileSync(claudeMdDest, 'utf-8')
+      if (!existing.includes('ZenKit Workflow Discipline')) {
+        fs.appendFileSync(claudeMdDest, '\n\n' + content)
+        console.log('  appended ZenKit section to CLAUDE.md')
+      } else {
+        console.log('  exists  CLAUDE.md (already has ZenKit section)')
+      }
+    } else {
+      fs.copyFileSync(claudeMdSrc, claudeMdDest)
+      console.log('  created CLAUDE.md')
+    }
+  }
+
+  console.log(`
+Done. ZenKit is now available in Claude Code.
+
+Commands (use as /slash-commands):
+  /zenkit-spec        Write a feature specification
+  /zenkit-plan        Create an implementation plan
+  /zenkit-build       Implement from a plan
+  /zenkit-audit       Review changes for quality
+  /zenkit-checkpoint  Capture current state
+  /zenkit-handoff     Produce a context transfer
+
+Skills (activated automatically):
+  zenkit-audit        Structured code review with rubrics
+  zenkit-handoff      Context-preserving handoff documents
+  zenkit-checkpoint   State snapshots with validated/assumed distinction
+
+Start with: /zenkit-spec "your feature description"`)
+}
+
 function init() {
+  if (args[1] === 'claude') {
+    initClaude()
+    return
+  }
+
   const targetDir = args[1] ? path.resolve(args[1]) : process.cwd()
   const dirs = ['commands', 'schemas', 'skills', 'hooks', 'agents', 'rubrics', 'templates', 'benchmark/feature-specs', 'benchmark/results']
 
@@ -125,6 +219,7 @@ function init() {
 
   console.log('\nZenKit structure initialized.')
   console.log('Next: add schemas, commands, and feature specs.')
+  console.log('\nFor Claude Code integration instead, run: zenkit init claude')
 }
 
 // Dispatch
@@ -174,7 +269,8 @@ Commands:
   benchmark:report [result]  Generate markdown report
   benchmark:compare [z] [b]  Compare zenkit vs baseline
   audit                      Run all benchmarks and produce audit report
-  init [dir]                 Scaffold ZenKit structure
+  init claude [dir]           Install Claude Code commands + skills + CLAUDE.md
+  init [dir]                 Scaffold full ZenKit protocol structure
   status                     Show project ZenKit status
 
 Schemas: ${getSchemaNames().join(', ')}`)

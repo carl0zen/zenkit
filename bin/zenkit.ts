@@ -87,19 +87,65 @@ function validate() {
   }
 }
 
-function init() {
-  const targetDir = args[1] ? path.resolve(args[1]) : process.cwd()
-
-  const dirs = ['commands', 'schemas', 'skills', 'hooks', 'agents', 'rubrics', 'templates', 'benchmark/feature-specs', 'benchmark/results']
-  const files: Record<string, string> = {
-    'commands/.gitkeep': '',
-    'schemas/.gitkeep': '',
-    'skills/.gitkeep': '',
-    'hooks/.gitkeep': '',
-    'agents/.gitkeep': '',
-    'rubrics/.gitkeep': '',
-    'templates/.gitkeep': '',
+function copyDirRecursive(src: string, dest: string, relBase: string) {
+  if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true })
+  for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
+    const srcPath = path.join(src, entry.name)
+    const destPath = path.join(dest, entry.name)
+    if (entry.isDirectory()) {
+      copyDirRecursive(srcPath, destPath, relBase)
+    } else if (!fs.existsSync(destPath)) {
+      fs.copyFileSync(srcPath, destPath)
+      console.log(`  created ${path.relative(relBase, destPath)}`)
+    } else {
+      console.log(`  exists  ${path.relative(relBase, destPath)}`)
+    }
   }
+}
+
+function initClaude() {
+  const targetDir = args[2] ? path.resolve(args[2]) : process.cwd()
+  const templateDir = path.resolve(__dirname, '..', 'templates', 'claude')
+
+  console.log('ZenKit for Claude Code')
+  console.log('======================\n')
+
+  if (!fs.existsSync(templateDir)) {
+    console.error('Could not find Claude Code templates.')
+    process.exit(1)
+  }
+
+  const claudeSrc = path.join(templateDir, '.claude')
+  if (fs.existsSync(claudeSrc)) {
+    copyDirRecursive(claudeSrc, path.join(targetDir, '.claude'), targetDir)
+  }
+
+  const claudeMdSrc = path.join(templateDir, 'CLAUDE.md')
+  const claudeMdDest = path.join(targetDir, 'CLAUDE.md')
+  if (fs.existsSync(claudeMdSrc)) {
+    const content = fs.readFileSync(claudeMdSrc, 'utf-8')
+    if (fs.existsSync(claudeMdDest)) {
+      const existing = fs.readFileSync(claudeMdDest, 'utf-8')
+      if (!existing.includes('ZenKit Workflow Discipline')) {
+        fs.appendFileSync(claudeMdDest, '\n\n' + content)
+        console.log('  appended ZenKit section to CLAUDE.md')
+      } else {
+        console.log('  exists  CLAUDE.md (already has ZenKit section)')
+      }
+    } else {
+      fs.copyFileSync(claudeMdSrc, claudeMdDest)
+      console.log('  created CLAUDE.md')
+    }
+  }
+
+  console.log(`\nDone. Commands: /zenkit-spec, /zenkit-plan, /zenkit-build, /zenkit-audit, /zenkit-checkpoint, /zenkit-handoff`)
+}
+
+function init() {
+  if (args[1] === 'claude') { initClaude(); return }
+
+  const targetDir = args[1] ? path.resolve(args[1]) : process.cwd()
+  const dirs = ['commands', 'schemas', 'skills', 'hooks', 'agents', 'rubrics', 'templates', 'benchmark/feature-specs', 'benchmark/results']
 
   console.log(`Initializing ZenKit in ${targetDir}\n`)
 
@@ -113,15 +159,8 @@ function init() {
     }
   }
 
-  for (const [file, content] of Object.entries(files)) {
-    const full = path.join(targetDir, file)
-    if (!fs.existsSync(full)) {
-      fs.writeFileSync(full, content)
-    }
-  }
-
   console.log('\nZenKit structure initialized.')
-  console.log('Next: copy schemas from the ZenKit repo, or define your own.')
+  console.log('For Claude Code integration: zenkit init claude')
 }
 
 function status() {
