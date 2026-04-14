@@ -1,0 +1,91 @@
+{
+  "feature_id": "ccp-001",
+  "name": "Claude Code Integration Pack",
+  "description": "Slash commands, skills, and CLAUDE.md template for native Claude Code integration.",
+  "mode": "zenkit",
+  "acceptance_criteria": [
+    {
+      "id": "ccp-1",
+      "description": "CLAUDE.md template exists with workflow instructions",
+      "verification": { "type": "file_contains", "path": "templates/claude/CLAUDE.md", "pattern": "ZenKit Workflow Discipline" }
+    },
+    {
+      "id": "ccp-2",
+      "description": "zenkit-spec command file exists with structured output contract",
+      "verification": { "type": "file_contains", "path": "templates/claude/.claude/commands/zenkit-spec.md", "pattern": "Acceptance criteria" }
+    },
+    {
+      "id": "ccp-3",
+      "description": "zenkit-plan command file exists",
+      "verification": { "type": "file_exists", "path": "templates/claude/.claude/commands/zenkit-plan.md" }
+    },
+    {
+      "id": "ccp-4",
+      "description": "zenkit-build command references the output contract",
+      "verification": { "type": "file_contains", "path": "templates/claude/.claude/commands/zenkit-build.md", "pattern": "Next handoff" }
+    },
+    {
+      "id": "ccp-5",
+      "description": "zenkit-audit command includes rubric scoring",
+      "verification": { "type": "file_contains", "path": "templates/claude/.claude/commands/zenkit-audit.md", "pattern": "Execution quality" }
+    },
+    {
+      "id": "ccp-6",
+      "description": "zenkit-checkpoint command enforces validated vs assumed distinction",
+      "verification": { "type": "file_contains", "path": "templates/claude/.claude/commands/zenkit-checkpoint.md", "pattern": "validated" }
+    },
+    {
+      "id": "ccp-7",
+      "description": "zenkit-handoff command requires next_agent",
+      "verification": { "type": "file_contains", "path": "templates/claude/.claude/commands/zenkit-handoff.md", "pattern": "Next agent" }
+    },
+    {
+      "id": "ccp-8",
+      "description": "Audit skill has SKILL.md with description frontmatter",
+      "verification": { "type": "file_contains", "path": "templates/claude/.claude/skills/zenkit-audit/SKILL.md", "pattern": "description:" }
+    },
+    {
+      "id": "ccp-9",
+      "description": "Handoff skill has SKILL.md",
+      "verification": { "type": "file_exists", "path": "templates/claude/.claude/skills/zenkit-handoff/SKILL.md" }
+    },
+    {
+      "id": "ccp-10",
+      "description": "Checkpoint skill enforces gate conditions",
+      "verification": { "type": "file_contains", "path": "templates/claude/.claude/skills/zenkit-checkpoint/SKILL.md", "pattern": "Gate conditions" }
+    },
+    {
+      "id": "ccp-11",
+      "description": "CLI init claude command exists in source",
+      "verification": { "type": "file_contains", "path": "src/cli.ts", "pattern": "initClaude" }
+    },
+    {
+      "id": "ccp-12",
+      "description": "zenkit init claude runs successfully",
+      "verification": { "type": "test_passes", "command": "tmpdir=$(mktemp -d) && npx tsx bin/zenkit.ts init claude \"$tmpdir\" && test -f \"$tmpdir/CLAUDE.md\" && test -f \"$tmpdir/.claude/commands/zenkit-spec.md\" && rm -rf \"$tmpdir\"" }
+    }
+  ],
+  "constraints": [
+    "Must work without npm install — npx zenkit init claude is the entry point",
+    "Must create files compatible with Claude Code's command and skill format",
+    "No runtime dependencies — pure file copy"
+  ],
+  "expected_files": [
+    "templates/claude/CLAUDE.md",
+    "templates/claude/.claude/commands/zenkit-spec.md",
+    "templates/claude/.claude/commands/zenkit-plan.md",
+    "templates/claude/.claude/commands/zenkit-build.md",
+    "templates/claude/.claude/commands/zenkit-audit.md",
+    "templates/claude/.claude/commands/zenkit-checkpoint.md",
+    "templates/claude/.claude/commands/zenkit-handoff.md",
+    "templates/claude/.claude/skills/zenkit-audit/SKILL.md",
+    "templates/claude/.claude/skills/zenkit-handoff/SKILL.md",
+    "templates/claude/.claude/skills/zenkit-checkpoint/SKILL.md"
+  ],
+  "assigned_commands": ["build", "audit"],
+  "estimated_complexity": "medium",
+  "limitations": [
+    "Verifies files exist and contain expected content — does not test that Claude Code actually loads and executes them",
+    "The init command test creates a temp dir and checks file presence, not Claude Code runtime behavior"
+  ]
+}
