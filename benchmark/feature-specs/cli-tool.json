@@ -1,0 +1,58 @@
+{
+  "feature_id": "cli-001",
+  "name": "ZenKit CLI Tool",
+  "description": "The zenkit CLI provides validate, benchmark, audit, init, and status commands.",
+  "mode": "zenkit",
+  "acceptance_criteria": [
+    {
+      "id": "cli-1",
+      "description": "CLI entry point exists and is executable",
+      "verification": { "type": "file_exists", "path": "bin/zenkit.ts" }
+    },
+    {
+      "id": "cli-2",
+      "description": "CLI exports a bin field in package.json",
+      "verification": { "type": "file_contains", "path": "package.json", "pattern": "\"zenkit\":" }
+    },
+    {
+      "id": "cli-3",
+      "description": "CLI help command works",
+      "verification": { "type": "test_passes", "command": "npx tsx bin/zenkit.ts help" }
+    },
+    {
+      "id": "cli-4",
+      "description": "CLI status command works",
+      "verification": { "type": "test_passes", "command": "npx tsx bin/zenkit.ts status" }
+    },
+    {
+      "id": "cli-5",
+      "description": "CLI validate:all command works",
+      "verification": { "type": "test_passes", "command": "npx tsx bin/zenkit.ts validate:all" }
+    },
+    {
+      "id": "cli-6",
+      "description": "CLI validates a valid fixture",
+      "verification": { "type": "test_passes", "command": "npx tsx bin/zenkit.ts validate handoff benchmark/fixtures/valid-handoff.json" }
+    },
+    {
+      "id": "cli-7",
+      "description": "Package has repository field for npm",
+      "verification": { "type": "json_path_equals", "path": "package.json", "json_path": "repository.type", "equals": "git" }
+    }
+  ],
+  "constraints": [
+    "CLI must work via npx tsx without compilation step",
+    "All commands must exit 0 on success, non-zero on failure"
+  ],
+  "expected_files": [
+    "bin/zenkit.ts",
+    "package.json"
+  ],
+  "assigned_commands": ["build", "audit"],
+  "estimated_complexity": "low",
+  "limitations": [
+    "Verifies commands exit successfully, not that their output is semantically correct",
+    "Does not test zenkit init in isolation (tested in unit tests)",
+    "Does not test zenkit audit (slow — runs all benchmarks recursively)"
+  ]
+}
