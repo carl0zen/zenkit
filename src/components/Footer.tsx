@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 export function Footer() {
   return (
     <footer className="py-12 border-t border-zen-800/50">
@@ -9,9 +11,9 @@ export function Footer() {
           <a href="https://github.com/carl0zen/zenkit" className="hover:text-zen-400 transition-colors">
             GitHub
           </a>
-          <a href="/playground" className="hover:text-zen-400 transition-colors">
+          <Link href="/playground" className="hover:text-zen-400 transition-colors">
             Playground
-          </a>
+          </Link>
           <span>Disciplined workflows for coding agents.</span>
         </div>
       </div>

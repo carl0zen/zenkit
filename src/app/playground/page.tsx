@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import Link from 'next/link'
 import { SchemaSelector } from '@/components/playground/SchemaSelector'
 import { JsonEditor } from '@/components/playground/JsonEditor'
 import { ValidationResults } from '@/components/playground/ValidationResults'
@@ -47,9 +48,9 @@ export default function PlaygroundPage() {
       <header className="border-b border-zen-800/50 bg-zen-950/80 backdrop-blur-md">
         <div className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <a href="/" className="font-mono text-sm text-zen-400 hover:text-zen-200 transition-colors">
+            <Link href="/" className="font-mono text-sm text-zen-400 hover:text-zen-200 transition-colors">
               zenkit
-            </a>
+            </Link>
             <span className="text-zen-700">/</span>
             <span className="font-mono text-sm text-zen-200">playground</span>
           </div>
