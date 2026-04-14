@@ -4,6 +4,46 @@
 
 ZenKit is a lightweight open-source protocol layer for AI-assisted software building. Commands, schemas, hooks, checkpoints, and handoffs — without framework bloat.
 
+## Install
+
+```bash
+npm install @anthropic/zenkit
+```
+
+### As a library
+
+```typescript
+import { validate, getSchemaNames, createHandoff, loadFeatureSpec } from '@anthropic/zenkit'
+
+// Validate data against any ZenKit schema
+const result = validate('handoff', myHandoffData)
+if (!result.valid) {
+  console.error(result.errors) // [{ path: '/deliverable', message: '...', keyword: '...' }]
+}
+
+// Create a validated handoff
+const handoff = createHandoff({
+  context: 'Completed auth module',
+  assumptions: ['Redis available'],
+  decision: 'JWT with refresh tokens',
+  deliverable: { type: 'code', description: 'Auth module' },
+  next_agent: 'frontend-architect',
+})
+
+// Load and validate a feature spec
+const spec = loadFeatureSpec('benchmark/feature-specs/my-feature.json')
+```
+
+### As a CLI
+
+```bash
+npx zenkit validate handoff data.json    # Validate JSON against schema
+npx zenkit benchmark:all                 # Run all benchmark specs
+npx zenkit audit                         # Full audit with report
+npx zenkit status                        # Project health check
+npx zenkit init                          # Scaffold ZenKit into a project
+```
+
 ## Problem
 
 Most AI-assisted development workflows share structural failures unrelated to model capability:
@@ -49,7 +89,7 @@ npm run zenkit benchmark:all    # Run all 5 benchmark specs
 
 # Development
 npm run dev              # Landing page at localhost:3000, playground at /playground
-npm test                 # 42 unit tests
+npm test                 # 54 unit tests
 npm run test:e2e         # 13 Playwright E2E browser tests
 npm run lint             # ESLint
 npm run build            # Production build
@@ -117,6 +157,28 @@ npm run benchmark:visualize -- --summary  # Mermaid diagram of all specs
 npm run benchmark:visualize               # Mermaid diagram of single result
 ```
 
+## API Reference
+
+### `validate(schemaName, data)`
+
+Validate data against a ZenKit schema. Returns `{ valid, errors, schemaName }`.
+
+### `getSchemaNames()`
+
+Returns array of all schema names: `handoff`, `task`, `audit`, `checkpoint`, `benchmark`, `feature-spec`.
+
+### `getSchema(name)`
+
+Returns the raw JSON Schema object for a named schema.
+
+### `createHandoff(data)`
+
+Create and validate a handoff object. Returns the handoff if valid, throws if invalid.
+
+### `loadFeatureSpec(path)`
+
+Load a feature spec from a JSON file. Validates against `feature-spec.schema.json`. Returns the spec if valid, throws if invalid.
+
 ## Schema Validator Playground
 
 Interactive tool at `/playground` for validating JSON against ZenKit schemas. Client-side validation with Ajv, pre-loaded examples, detailed error paths.
@@ -138,7 +200,7 @@ npm run zenkit init [dir]                   # Scaffold ZenKit into a project
 
 | Layer | Tests | What it covers |
 |-------|-------|----------------|
-| Unit (Vitest) | 42 | Schema validation, example data, edge cases, benchmark results, CLI commands, handoff validation, feature spec validation |
+| Unit (Vitest) | 54 | Schema validation, example data, edge cases, benchmark results, CLI commands, public API, handoff creation, feature spec loading |
 | E2E (Playwright) | 13 | Playground UI, schema selection, validation flows, format button, landing page sections, navigation |
 | Benchmarks | 131 checks | Code structure, schema compilation, test execution, JSON values, documentation, self-audit, CLI |
 
