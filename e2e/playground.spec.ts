@@ -69,8 +69,8 @@ test.describe('Schema Validator Playground', () => {
     await expect(page.locator('pre').first()).not.toBeVisible()
   })
 
-  test('validates all 5 schemas with example data', async ({ page }) => {
-    const schemas = ['handoff', 'task', 'audit', 'checkpoint', 'benchmark']
+  test('validates all 6 schemas with example data', async ({ page }) => {
+    const schemas = ['handoff', 'task', 'audit', 'checkpoint', 'benchmark', 'feature-spec']
     for (const schema of schemas) {
       await page.selectOption('#schema-select', schema)
       await page.click('button:has-text("Validate")')

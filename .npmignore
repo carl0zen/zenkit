@@ -1,0 +1,25 @@
+# Development artifacts
+.next/
+test-results/
+playwright-report/
+coverage/
+e2e/
+src/
+.github/
+.claude/
+.eslintrc.json
+vitest.config.ts
+playwright.config.ts
+tailwind.config.ts
+postcss.config.js
+next.config.js
+next-env.d.ts
+CLAUDE.md
+
+# Benchmark generated results (not snapshots)
+benchmark/results/*-live.json
+benchmark/results/*-live.md
+benchmark/results/summary.json
+benchmark/results/summary.md
+benchmark/results/*.mermaid
+benchmark/results/audit-report.json
