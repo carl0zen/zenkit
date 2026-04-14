@@ -1,9 +1,9 @@
 {
-  "comparison_id": "cmp-1776124664052",
+  "comparison_id": "cmp-1776126485728",
   "version": "0.2.0",
   "zenkit_result": "benchmark/results/svp-001-live.json",
   "baseline_result": "benchmark/results/svp-001-baseline-live.json",
-  "generated_at": "2026-04-13T23:57:44.052Z",
+  "generated_at": "2026-04-14T00:28:05.728Z",
   "data_source": "illustrative",
   "summary": {
     "zenkit_status": "pass",
@@ -12,8 +12,8 @@
     "baseline_criteria_passed": 8,
     "zenkit_total_checks": 25,
     "baseline_total_checks": 25,
-    "zenkit_duration_ms": 101,
-    "baseline_duration_ms": 99
+    "zenkit_duration_ms": 112,
+    "baseline_duration_ms": 119
   },
   "structural_differences": [
     {

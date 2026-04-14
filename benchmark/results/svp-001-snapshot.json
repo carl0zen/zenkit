@@ -1,12 +1,12 @@
 {
-  "benchmark_id": "bench-svp-001-1776124654665",
+  "benchmark_id": "bench-svp-001-1776126445574",
   "version": "0.2.0",
   "mode": "zenkit",
   "task_name": "Schema Validator Playground",
   "feature_spec": "benchmark/feature-specs/schema-validator-playground.json",
-  "started_at": "2026-04-13T23:57:34.564Z",
-  "completed_at": "2026-04-13T23:57:34.665Z",
-  "duration_ms": 101,
+  "started_at": "2026-04-14T00:27:25.461Z",
+  "completed_at": "2026-04-14T00:27:25.573Z",
+  "duration_ms": 112,
   "status": "pass",
   "expected_files": [
     "src/app/playground/page.tsx",
@@ -87,7 +87,7 @@
     {
       "name": "spec",
       "status": "pass",
-      "duration_ms": 19,
+      "duration_ms": 21,
       "checks_run": 4,
       "checks_passed": 4,
       "details": [
@@ -100,7 +100,7 @@
     {
       "name": "schemas",
       "status": "pass",
-      "duration_ms": 47,
+      "duration_ms": 48,
       "checks_run": 7,
       "checks_passed": 7,
       "details": [
