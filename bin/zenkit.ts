@@ -188,6 +188,108 @@ function status() {
   }
 }
 
+function audit() {
+  console.log('ZenKit Audit')
+  console.log('============\n')
+
+  // Run all benchmarks
+  let benchmarkOutput = ''
+  try {
+    benchmarkOutput = execSync('npx tsx benchmark/scripts/run-all.ts', {
+      cwd: ROOT,
+      encoding: 'utf-8',
+      timeout: 120000,
+    })
+    console.log(benchmarkOutput)
+  } catch (err: any) {
+    benchmarkOutput = err.stdout || ''
+    console.log(benchmarkOutput)
+  }
+
+  // Read the summary
+  const summaryPath = path.join(ROOT, 'benchmark/results/summary.json')
+  if (!fs.existsSync(summaryPath)) {
+    console.error('No benchmark summary found.')
+    process.exit(1)
+  }
+  const summary = JSON.parse(fs.readFileSync(summaryPath, 'utf-8'))
+
+  // Build audit report per audit.schema.json
+  const findings: any[] = []
+
+  for (const result of summary.results) {
+    if (result.status !== 'pass') {
+      findings.push({
+        category: 'correctness',
+        severity: 'error',
+        description: `Benchmark spec ${result.spec} status: ${result.status} (${result.criteria} criteria, ${result.checks} checks)`,
+      })
+    }
+  }
+
+  // Check for structural completeness
+  const requiredDirs = ['commands', 'schemas', 'skills', 'hooks', 'agents', 'rubrics']
+  for (const dir of requiredDirs) {
+    const full = path.join(ROOT, dir)
+    if (!fs.existsSync(full) || fs.readdirSync(full).filter(f => !f.startsWith('.')).length === 0) {
+      findings.push({
+        category: 'architecture',
+        severity: 'warning',
+        description: `Protocol directory ${dir}/ is missing or empty`,
+      })
+    }
+  }
+
+  if (!fs.existsSync(path.join(ROOT, '.github/workflows/ci.yml'))) {
+    findings.push({
+      category: 'testing',
+      severity: 'info',
+      description: 'No CI workflow found',
+    })
+  }
+
+  const allPass = summary.failed === 0 && findings.filter((f: any) => f.severity === 'error').length === 0
+  const verdict = allPass ? 'pass' : findings.some((f: any) => f.severity === 'error') ? 'fail' : 'conditional'
+
+  const auditReport = {
+    task_id: 'self-audit',
+    auditor: 'zenkit-cli',
+    timestamp: new Date().toISOString(),
+    verdict,
+    findings,
+    rubric_scores: {
+      execution_quality: Math.min(10, Math.round((summary.passed / summary.total) * 10)),
+      verbosity_score: 8,
+      architectural_alignment: findings.filter((f: any) => f.category === 'architecture').length === 0 ? 9 : 6,
+    },
+    open_questions: [
+      'Rubric scores for verbosity and alignment are self-assessed — independent review recommended',
+    ],
+    recommendations: allPass
+      ? ['All benchmark specs pass. Consider adding more feature specs for broader coverage.']
+      : findings.filter((f: any) => f.severity === 'error').map((f: any) => `Fix: ${f.description}`),
+  }
+
+  // Write the audit report
+  const auditPath = path.join(ROOT, 'benchmark/results/audit-report.json')
+  fs.writeFileSync(auditPath, JSON.stringify(auditReport, null, 2))
+
+  console.log('\n' + '='.repeat(50))
+  console.log(`Verdict: ${verdict.toUpperCase()}`)
+  console.log(`Findings: ${findings.length} (${findings.filter((f: any) => f.severity === 'error').length} errors)`)
+  console.log(`Benchmarks: ${summary.passed}/${summary.total} passed`)
+  console.log(`Report: ${auditPath}`)
+
+  if (findings.length > 0) {
+    console.log('\nFindings:')
+    for (const f of findings) {
+      console.log(`  [${f.severity.toUpperCase()}] ${f.description}`)
+    }
+  }
+
+  process.exit(verdict === 'fail' ? 1 : 0)
+}
+
 // --- Dispatch ---
 
 switch (command) {
@@ -223,6 +325,10 @@ switch (command) {
     run(`npx tsx benchmark/scripts/compare.ts ${args[1] || ''} ${args[2] || ''}`)
     break
 
+  case 'audit':
+    audit()
+    break
+
   case 'init':
     init()
     break
@@ -244,10 +350,11 @@ Commands:
   benchmark:all              Run all feature specs
   benchmark:report [result]  Generate markdown report
   benchmark:compare [z] [b]  Compare zenkit vs baseline
+  audit                      Run all benchmarks and produce audit report
   init [dir]                 Scaffold ZenKit structure
   status                     Show project ZenKit status
 
-Schemas: handoff, task, audit, checkpoint, benchmark`)
+Schemas: handoff, task, audit, checkpoint, benchmark, feature-spec`)
     break
 
   default:
