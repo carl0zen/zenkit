@@ -4,33 +4,30 @@ export function OpenSource() {
       <div className="mx-auto max-w-6xl px-6">
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-2xl md:text-3xl font-semibold text-zen-100">
-            Public core, private overlays
+            Three layers, adopt what you need
           </h2>
-          <p className="mt-4 text-zen-400 leading-relaxed">
-            ZenKit&apos;s protocol layer is fully open source. Commands, schemas,
-            hooks, and rubrics live in your repo alongside your code. Extend
-            with private skills, proprietary agent configs, or custom
-            benchmarks as needed.
-          </p>
 
           <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 text-left">
             <div className="p-4 border border-zen-800/60 rounded-lg">
-              <div className="font-mono text-xs text-zen-500 mb-2">Explore</div>
-              <p className="text-sm text-zen-300">
-                Read the source. Understand the protocol. Try the playground.
+              <div className="font-mono text-xs text-zen-400 mb-2">Layer 1: Claude Code pack</div>
+              <p className="text-sm text-zen-400">
+                Slash commands, skills, and CLAUDE.md. One command, zero dependencies.
               </p>
+              <div className="mt-3 font-mono text-xs text-zen-500">npx zenkit init claude</div>
             </div>
             <div className="p-4 border border-zen-800/60 rounded-lg">
-              <div className="font-mono text-xs text-zen-500 mb-2">Benchmark</div>
-              <p className="text-sm text-zen-300">
-                Run a feature through the workflow. See the artifacts. Verify the claims.
+              <div className="font-mono text-xs text-zen-400 mb-2">Layer 2: Protocol + CLI</div>
+              <p className="text-sm text-zen-400">
+                Schemas, benchmarks, validation engine. For teams that want machine-verifiable workflows.
               </p>
+              <div className="mt-3 font-mono text-xs text-zen-500">npm install zenkit</div>
             </div>
             <div className="p-4 border border-zen-800/60 rounded-lg">
-              <div className="font-mono text-xs text-zen-500 mb-2">Extend</div>
-              <p className="text-sm text-zen-300">
-                Add commands, skills, and agents. Adapt to your stack and team.
+              <div className="font-mono text-xs text-zen-400 mb-2">Layer 3: MCP server</div>
+              <p className="text-sm text-zen-400">
+                Dynamic tool calls for validate, benchmark, and checkpoint. Coming soon.
               </p>
+              <div className="mt-3 font-mono text-xs text-zen-600">planned</div>
             </div>
           </div>
 
@@ -42,7 +39,7 @@ export function OpenSource() {
               className="inline-flex items-center gap-2 px-6 py-3 bg-zen-100 text-zen-950 text-sm font-medium rounded-lg hover:bg-white transition-colors"
             >
               View on GitHub
-              <span className="text-lg">→</span>
+              <span className="text-lg">&rarr;</span>
             </a>
           </div>
         </div>
