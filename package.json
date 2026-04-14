@@ -1,5 +1,5 @@
 {
-  "name": "@carl0zen/zenkit",
+  "name": "zenkit",
   "version": "0.5.0",
   "private": false,
   "description": "Disciplined workflows for coding agents — a lightweight open-source protocol layer for AI-assisted software building.",

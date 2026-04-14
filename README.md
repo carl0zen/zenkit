@@ -7,13 +7,13 @@ ZenKit is a lightweight open-source protocol layer for AI-assisted software buil
 ## Install
 
 ```bash
-npm install @carl0zen/zenkit
+npm install zenkit
 ```
 
 ### As a library
 
 ```typescript
-import { validate, getSchemaNames, createHandoff, loadFeatureSpec } from '@carl0zen/zenkit'
+import { validate, getSchemaNames, createHandoff, loadFeatureSpec } from 'zenkit'
 
 // Validate data against any ZenKit schema
 const result = validate('handoff', myHandoffData)

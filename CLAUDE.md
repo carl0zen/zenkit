@@ -2,7 +2,7 @@
 
 ## What this repo is
 
-ZenKit is a lightweight protocol layer for AI-assisted software building. It provides commands, schemas, hooks, checkpoints, and handoffs as plain files — no runtime, no daemon. It also exports a programmatic TypeScript API (`import { validate, createHandoff } from '@carl0zen/zenkit'`).
+ZenKit is a lightweight protocol layer for AI-assisted software building. It provides commands, schemas, hooks, checkpoints, and handoffs as plain files — no runtime, no daemon. It also exports a programmatic TypeScript API (`import { validate, createHandoff } from 'zenkit'`).
 
 ## Project structure
 
