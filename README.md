@@ -1,8 +1,14 @@
 # ZenKit
 
+[![CI](https://github.com/carl0zen/zenkit/actions/workflows/ci.yml/badge.svg)](https://github.com/carl0zen/zenkit/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/zenkit)](https://www.npmjs.com/package/zenkit)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 **Disciplined workflows for coding agents.**
 
 ZenKit is a lightweight open-source protocol layer for AI-assisted software building. Commands, schemas, hooks, checkpoints, and handoffs — without framework bloat.
+
+**[Landing Page](https://carl0zen.github.io/zenkit)** | **[Playground](https://carl0zen.github.io/zenkit/playground)** | **[npm](https://www.npmjs.com/package/zenkit)**
 
 ## Install
 
