@@ -79,6 +79,10 @@ Agent A                    Agent B
 
 Handoff artifacts are versioned and stored alongside the code they describe. They are first-class project artifacts, not ephemeral messages.
 
+## The CLI
+
+The `zenkit` CLI provides the executable interface to the protocol: `validate` checks data against schemas, `benchmark` runs feature specs, `audit` produces structured audit reports, `init` scaffolds ZenKit into a project, and `status` shows project health. The CLI is a thin wrapper — it delegates to the same scripts and schemas that compose the protocol layer.
+
 ## What Is Not Here
 
-There is no central orchestrator. There is no agent registry service. There is no shared memory bus. Coordination happens through files, schemas, and explicit contracts. This is intentional -- it means ZenKit works with any AI provider, any CI system, and any language.
+There is no central orchestrator. There is no agent registry service. There is no shared memory bus. Coordination happens through files, schemas, and explicit contracts. This is intentional — ZenKit works with any AI provider, any CI system, and any language.
